@@ -9,186 +9,322 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; overflow: hidden; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+      -webkit-tap-highlight-color: transparent; 
+      overflow-x: hidden; 
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* --- THEME VARIABELS (TERANG & GELAP) --- */
+    body.theme-dark {
+      background: #090d16;
+      color: #f1f5f9;
+    }
+    body.theme-light {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
     .hide { display: none !important; }
     
     /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.02); }
+    ::-webkit-scrollbar-thumb { background: rgba(100, 100, 100, 0.2); border-radius: 10px; }
     
-    /* Toast Notif */
+    /* Panels */
+    body.theme-dark .panel-theme {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    body.theme-light .panel-theme {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    body.theme-dark .panel-light-theme {
+      background: #1f2937;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    body.theme-light .panel-light-theme {
+      background: #f1f5f9;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    body.theme-dark .input-theme {
+      background: #0b0f19 !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      color: #f8fafc !important;
+    }
+    body.theme-light .input-theme {
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.15) !important;
+      color: #0f172a !important;
+    }
+    .input-theme:focus {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+    }
+
+    body.theme-dark .table-theme th {
+      background: #0f172a !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      color: #94a3b8 !important;
+    }
+    body.theme-light .table-theme th {
+      background: #e2e8f0 !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+      color: #334155 !important;
+    }
+
+    body.theme-dark .table-theme td { border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important; }
+    body.theme-light .table-theme td { border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important; }
+    
+    body.theme-dark .table-theme tr:hover { background: rgba(255, 255, 255, 0.02) !important; }
+    body.theme-light .table-theme tr:hover { background: rgba(0, 0, 0, 0.02) !important; }
+
+    .view-section {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .bg-glow {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      filter: blur(60px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    body.theme-dark .bg-glow { background: rgba(37, 99, 235, 0.08); }
+    body.theme-light .bg-glow { background: rgba(37, 99, 235, 0.04); }
+
+    body.theme-dark .btn-theme-alt {
+      background: #1f2937;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+    }
+    body.theme-dark .btn-theme-alt:hover { background: #374151; }
+
+    body.theme-light .btn-theme-alt {
+      background: #e2e8f0;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: #1e293b;
+    }
+    body.theme-light .btn-theme-alt:hover { background: #cbd5e1; }
+
+    /* Styling Khusus Banner Publik agar Kontras di Kedua Tema */
+    body.theme-light #publicBanner {
+      background-color: #fef3c7;
+      border-color: #fcd34d;
+      color: #78350f;
+    }
+    body.theme-dark #publicBanner {
+      background-color: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fde68a;
+    }
+
     .toast {
       position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 400px; margin: 0 auto;
       transform: translateY(150%); opacity: 0;
-      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: transform 0.3s ease, opacity 0.3s ease;
       z-index: 9999;
     }
     .toast.show { transform: translateY(0); opacity: 1; }
     
-    .logo-img { object-fit: contain; width: 100%; height: 100%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+    .logo-img { object-fit: contain; width: 100%; height: 100%; }
 
-    /* Mobile Sidebar */
     @media (max-width: 768px) {
       aside { position: fixed; left: -100%; top: 0; bottom: 0; width: 280px; transition: left 0.3s ease; z-index: 50; }
       aside.mobile-open { left: 0; }
-      .mobile-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); z-index: 40; display: none; opacity: 0; transition: opacity 0.3s; }
-      .mobile-overlay.show { display: block; opacity: 1; }
-      .table-wrapper { padding-bottom: 1rem; }
+      .mobile-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 40; display: none; }
+      .mobile-overlay.show { display: block; }
     }
 
-    /* Loader Animation */
-    .spinner-ring { border: 4px solid rgba(255,255,255,0.1); border-left-color: #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    .spinner-ring { border: 3px solid rgba(150,150,150,0.2); border-left-color: #3b82f6; border-radius: 50%; width: 36px; height: 36px; animation: spin 0.8s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .pulse-logo { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .7; transform: scale(0.95); } }
   </style>
 </head>
-<body class="text-slate-800 flex h-screen">
+<body class="flex h-screen relative overflow-hidden">
 
-  <!-- INTRO / GLOBAL LOADER -->
-  <div id="globalLoader" class="fixed inset-0 z-[9999] bg-slate-900 flex flex-col items-center justify-center transition-opacity duration-500">
-    <div class="w-24 h-24 bg-white rounded-3xl flex items-center justify-center p-3 mb-6 shadow-[0_0_40px_rgba(59,130,246,0.3)] pulse-logo">
-      <img src="https://i.postimg.cc/hhFCvNCZ/logo-fourteen-jpg.jpg" onerror="this.src='https://ui-avatars.com/api/?name=FBC&background=0D8ABC&color=fff&size=150';" alt="FBC Logo" class="logo-img rounded-xl">
-    </div>
-    <div class="flex flex-col items-center gap-3">
-      <div class="spinner-ring"></div>
-      <span class="text-white font-medium tracking-wide text-sm">Memuat Portal FBC...</span>
+  <div class="bg-glow top-[-100px] left-[-100px]"></div>
+  <div class="bg-glow bottom-[-100px] right-[-100px]"></div>
+
+  <!-- INTRO VIDEO SPLASH SCREEN -->
+  <div id="globalLoader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500 bg-slate-950">
+    <div class="relative w-full h-full flex flex-col items-center justify-center overflow-hidden px-4">
+      <video id="introVideo" autoplay muted playsinline class="absolute inset-0 w-full h-full object-cover opacity-40">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-player-hitting-a-shuttlecock-in-a-game-41604-large.mp4" type="video/mp4">
+      </video>
+      <div class="absolute inset-0 bg-slate-950/90"></div>
+      
+      <div class="relative z-10 flex flex-col items-center gap-4 text-center">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 panel-theme rounded-2xl flex items-center justify-center p-3 shadow-xl">
+          <img src="https://i.postimg.cc/hhFCvNCZ/logo-fourteen-jpg.jpg" onerror="this.src='https://ui-avatars.com/api/?name=FBC&background=0D8ABC&color=fff&size=150';" alt="FBC Logo" class="logo-img rounded-xl">
+        </div>
+        <div class="space-y-1">
+          <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-wide">Fourteen Badminton Club</h1>
+          <p class="text-xs sm:text-sm text-blue-400 font-bold uppercase tracking-widest">Management Portal</p>
+        </div>
+        <div class="flex items-center gap-3 mt-2">
+          <div class="spinner-ring"></div>
+          <span class="text-slate-300 font-medium text-xs">Menyiapkan Sistem...</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ACTION LOADER (Untuk Edit, Login, Upload) -->
-  <div id="actionLoader" class="fixed inset-0 z-[9998] bg-slate-900/70 backdrop-blur-sm flex flex-col items-center justify-center hide transition-opacity">
-    <div class="bg-white px-6 py-5 rounded-2xl shadow-2xl flex flex-col items-center gap-3 transform scale-100 animate-[pulse_1s_ease-in-out_infinite]">
-      <i class="fas fa-circle-notch fa-spin text-blue-600 text-3xl"></i>
-      <span id="actionLoaderText" class="text-slate-800 font-bold text-sm">Memproses...</span>
+  <!-- ACTION LOADER -->
+  <div id="actionLoader" class="fixed inset-0 z-[9998] bg-black/60 flex flex-col items-center justify-center hide px-4">
+    <div class="panel-theme px-6 py-5 rounded-2xl shadow-2xl flex flex-col items-center gap-3">
+      <i class="fas fa-circle-notch fa-spin text-blue-500 text-3xl"></i>
+      <span id="actionLoaderText" class="font-bold text-sm text-center">Memproses...</span>
     </div>
   </div>
 
   <div id="mobileOverlay" class="mobile-overlay" onclick="toggleMobileMenu()"></div>
 
   <!-- SIDEBAR -->
-  <aside id="appSidebar" class="w-72 md:w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 transition-all shadow-2xl md:shadow-none">
-    <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800 shrink-0">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center p-1 border border-white/20 shadow-md shrink-0">
+  <aside id="appSidebar" class="w-72 md:w-64 panel-theme flex flex-col shrink-0 z-50 h-full">
+    <div class="h-20 flex items-center justify-between px-5 border-b border-inherit shrink-0">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center p-1 border border-inherit shrink-0">
           <img src="https://i.postimg.cc/hhFCvNCZ/logo-fourteen-jpg.jpg" onerror="this.src='https://ui-avatars.com/api/?name=FBC&background=0D8ABC&color=fff&size=100';" alt="FBC Logo" class="logo-img rounded-lg">
         </div>
-        <div>
-          <span class="text-white font-bold text-base tracking-wide block leading-tight">Fourteen</span>
-          <span class="text-[10px] text-blue-400 font-bold tracking-wider uppercase">Badminton Club</span>
+        <div class="overflow-hidden">
+          <span class="font-bold text-sm sm:text-base tracking-wide block leading-tight truncate">Fourteen</span>
+          <span class="text-[10px] text-blue-500 font-bold tracking-wider uppercase">Badminton Club</span>
         </div>
       </div>
-      <button type="button" onclick="toggleMobileMenu()" class="md:hidden text-slate-400 hover:text-white p-2">
+      <button type="button" onclick="toggleMobileMenu()" class="md:hidden opacity-75 hover:opacity-100 p-2 shrink-0">
         <i class="fas fa-xmark text-xl"></i>
       </button>
     </div>
     
-    <div class="p-4 flex-1 overflow-y-auto space-y-6">
+    <div class="p-4 flex-1 overflow-y-auto space-y-5 custom-scroll">
       <div>
-        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Menu Utama</div>
-        <nav class="space-y-1.5">
-          <a href="#" class="nav-btn active flex items-center gap-3 px-3.5 py-3 bg-blue-600 text-white rounded-xl transition-colors font-medium text-sm shadow-md shadow-blue-900/20" data-target="view-overview" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
+        <div class="text-[10px] font-bold opacity-60 uppercase tracking-wider mb-2 px-2">Menu Utama</div>
+        <nav class="space-y-1">
+          <a href="#" class="nav-btn active flex items-center gap-3 px-3.5 py-3 bg-blue-600 text-white rounded-xl transition-colors font-medium text-sm shadow-sm" data-target="view-overview" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
             <i class="fas fa-chart-pie w-5 text-center"></i> Overview
           </a>
-          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors font-medium text-sm" data-target="view-kas" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
+          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 btn-theme-alt rounded-xl transition-colors font-medium text-sm" data-target="view-kas" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
             <i class="fas fa-wallet w-5 text-center"></i> Buku Kas
           </a>
-          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors font-medium text-sm" data-target="view-presensi" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
+          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 btn-theme-alt rounded-xl transition-colors font-medium text-sm" data-target="view-presensi" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
             <i class="fas fa-clipboard-user w-5 text-center"></i> Daftar Hadir
           </a>
-          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors font-medium text-sm" data-target="view-anggota" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
+          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 btn-theme-alt rounded-xl transition-colors font-medium text-sm" data-target="view-anggota" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
             <i class="fas fa-users w-5 text-center"></i> Data Anggota
           </a>
         </nav>
       </div>
       <div>
-        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Akademik & Evaluasi</div>
-        <nav class="space-y-1.5">
-          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors font-medium text-sm" data-target="view-nilai" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
-            <i class="fas fa-star w-5 text-center text-amber-400"></i> Penilaian Eskul
+        <div class="text-[10px] font-bold opacity-60 uppercase tracking-wider mb-2 px-2">Akademik & Evaluasi</div>
+        <nav class="space-y-1">
+          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 btn-theme-alt rounded-xl transition-colors font-medium text-sm" data-target="view-nilai" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
+            <i class="fas fa-star w-5 text-center text-amber-500"></i> Penilaian Eskul
+          </a>
+        </nav>
+      </div>
+      <div>
+        <div class="text-[10px] font-bold opacity-60 uppercase tracking-wider mb-2 px-2">Kecerdasan Buatan</div>
+        <nav class="space-y-1">
+          <a href="#" class="nav-btn flex items-center gap-3 px-3.5 py-3 btn-theme-alt rounded-xl transition-colors font-medium text-sm" data-target="view-ai" onclick="if(window.innerWidth < 768) toggleMobileMenu()">
+            <i class="fas fa-robot w-5 text-center text-purple-400"></i> Gemini AI Assistant
           </a>
         </nav>
       </div>
     </div>
     
-    <div class="p-4 border-t border-slate-800 bg-slate-900/80 shrink-0">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0 transition-colors" id="roleIcon">
+    <div class="p-4 border-t border-inherit shrink-0 space-y-3">
+      <!-- Tombol Ganti Tema Manual -->
+      <button type="button" onclick="toggleThemeManual()" class="w-full btn-theme-alt font-bold py-2.5 px-3 rounded-xl transition-colors text-xs flex items-center justify-center gap-2 shadow-sm">
+        <i id="themeIconBtn" class="fas fa-moon text-blue-400"></i> <span id="themeTextBtn">Mode Gelap / Terang</span>
+      </button>
+
+      <div class="flex items-center gap-3 pt-1">
+        <div class="w-9 h-9 rounded-xl panel-light-theme border border-inherit flex items-center justify-center shrink-0" id="roleIcon">
           <i class="fas fa-user-globe"></i>
         </div>
         <div class="overflow-hidden">
-          <div class="text-sm font-bold text-white truncate" id="activeUserLabel">Mode Publik</div>
-          <div class="text-[10px] text-slate-400 truncate uppercase font-semibold tracking-wide" id="activeRoleLabel">Lihat Saja</div>
+          <div class="text-xs sm:text-sm font-bold truncate" id="activeUserLabel">Mode Publik</div>
+          <div class="text-[10px] opacity-70 truncate uppercase font-semibold tracking-wide" id="activeRoleLabel">Lihat Saja</div>
         </div>
       </div>
-      <button type="button" id="btnLoginMain" onclick="showLoginModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-3 rounded-xl transition-all shadow-lg shadow-blue-900/50 text-xs flex items-center justify-center gap-2">
+      <button type="button" id="btnLoginMain" onclick="showLoginModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-3 rounded-xl transition-colors text-xs flex items-center justify-center gap-2 shadow-sm">
         <i class="fas fa-key"></i> Masuk / Login
       </button>
-      <button type="button" id="btnLogoutMain" onclick="handleLogout()" class="w-full bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white font-bold py-2.5 px-3 rounded-xl transition-all text-xs flex items-center justify-center gap-2 hide">
+      <button type="button" id="btnLogoutMain" onclick="handleLogout()" class="w-full btn-theme-alt hover:bg-rose-600 hover:text-white font-bold py-2.5 px-3 rounded-xl transition-colors text-xs flex items-center justify-center gap-2 hide">
         <i class="fas fa-right-from-bracket"></i> Keluar Akun
       </button>
     </div>
   </aside>
 
   <!-- MAIN CONTENT -->
-  <main class="flex-1 flex flex-col h-screen overflow-hidden bg-[#f4f7fb] relative w-full">
+  <main class="flex-1 flex flex-col h-screen overflow-hidden relative w-full z-10">
     
     <!-- Mobile Header -->
-    <div class="md:hidden bg-white px-4 py-3 flex items-center justify-between shrink-0 shadow-sm border-b border-slate-200 z-10">
-      <div class="flex items-center gap-3">
-        <button type="button" onclick="toggleMobileMenu()" class="text-slate-600 hover:text-slate-900 p-1 bg-slate-100 rounded-lg w-9 h-9 flex items-center justify-center">
+    <div class="md:hidden panel-theme px-4 py-3 flex items-center justify-between shrink-0 border-b border-inherit z-10">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <button type="button" onclick="toggleMobileMenu()" class="p-1.5 panel-light-theme border border-inherit rounded-lg w-9 h-9 flex items-center justify-center shrink-0">
           <i class="fas fa-bars text-base"></i>
         </button>
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-md shadow-sm border border-slate-100 overflow-hidden bg-white flex items-center justify-center shrink-0">
+        <div class="flex items-center gap-2 overflow-hidden">
+            <div class="w-8 h-8 rounded-md border border-inherit overflow-hidden panel-light-theme flex items-center justify-center shrink-0">
               <img src="https://i.postimg.cc/hhFCvNCZ/logo-fourteen-jpg.jpg" onerror="this.src='https://ui-avatars.com/api/?name=FBC&background=0D8ABC&color=fff&size=100';" alt="FBC" class="w-full h-full object-contain">
             </div>
-            <span class="font-extrabold text-sm tracking-wide text-slate-800">FBC Portal</span>
+            <span class="font-extrabold text-sm tracking-wide truncate">FBC Portal</span>
         </div>
       </div>
+      <button type="button" onclick="toggleThemeManual()" class="p-2 panel-light-theme border border-inherit rounded-lg text-xs">
+        <i id="themeIconMobile" class="fas fa-moon"></i>
+      </button>
     </div>
 
-    <div id="publicBanner" class="bg-amber-500 text-white px-4 md:px-6 py-2.5 text-xs md:text-sm font-medium flex items-center justify-between shrink-0 shadow-md">
+    <!-- Banner Publik dengan Warna Kontras Aman untuk Mode Terang & Gelap -->
+    <div id="publicBanner" class="border-b px-4 md:px-6 py-2.5 text-xs md:text-sm font-medium flex items-center justify-between shrink-0 transition-colors">
       <div class="flex items-center gap-2 overflow-hidden">
-        <i class="fas fa-circle-info text-amber-100 text-base shrink-0"></i>
+        <i class="fas fa-circle-info text-amber-500 text-base shrink-0"></i>
         <span class="truncate">Mode <strong>Publik</strong>. Anda hanya dapat melihat data. Login untuk kelola.</span>
       </div>
-      <button type="button" onclick="showLoginModal()" class="bg-white text-amber-600 hover:bg-amber-50 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0 shadow-sm">LOGIN</button>
+      <button type="button" onclick="showLoginModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0 shadow-sm">LOGIN</button>
     </div>
 
-    <div id="mainScrollContainer" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6 pb-32 scroll-smooth">
+    <div id="mainScrollContainer" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6 pb-32">
       
       <!-- OVERVIEW -->
       <div id="view-overview" class="view-section space-y-6">
         
-        <!-- Papan Informasi & Hero -->
-        <div class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden flex flex-col gap-6 border border-slate-800">
-          <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
-          <div class="absolute -left-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
-          
+        <div class="panel-theme rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl relative overflow-hidden flex flex-col gap-6">
           <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 z-10">
             <div class="space-y-2">
-              <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-200 text-xs font-semibold backdrop-blur-sm">
-                <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span> Portal Informasi Eskul
+              <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-600 dark:text-blue-200 text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-blue-400"></span> Portal Informasi Eskul
               </div>
-              <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight flex items-center gap-3">
-                <i class="fas fa-bullhorn text-amber-400"></i> <span id="boardTitleDisplay">Jadwal & Pengumuman</span>
+              <h1 class="text-xl sm:text-2xl md:text-4xl font-extrabold tracking-tight flex items-center gap-3">
+                <i class="fas fa-bullhorn text-amber-500 shrink-0"></i> <span id="boardTitleDisplay" class="truncate">Jadwal & Pengumuman</span>
               </h1>
             </div>
-            <!-- Logo Hero Overview -->
-            <div class="hidden sm:flex items-center justify-center w-16 h-16 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 shadow-xl shrink-0 p-1">
-              <img src="https://i.postimg.cc/hhFCvNCZ/logo-fourteen-jpg.jpg" onerror="this.src='https://ui-avatars.com/api/?name=FBC&background=0D8ABC&color=fff&size=100';" alt="Logo" class="logo-img rounded-lg">
+            <div class="hidden sm:flex items-center justify-center w-16 h-16 panel-light-theme rounded-2xl shrink-0 p-1 border border-inherit">
+              <img src="https://i.postimg.cc/hhFCvNCZ/logo-fourteen-jpg.jpg" onerror="this.src='https://ui-avatars.com/api/?name=FBC&background=0D8ABC&color=fff&size=100';" alt="Logo" class="logo-img rounded-xl">
             </div>
           </div>
 
-          <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 md:p-6 text-blue-50 text-sm md:text-base leading-relaxed z-10 shadow-inner font-medium" id="boardContentDisplay">
+          <div class="panel-light-theme rounded-2xl p-4 sm:p-5 md:p-6 text-xs sm:text-sm md:text-base leading-relaxed z-10 font-medium border border-inherit" id="boardContentDisplay">
             Selamat datang di portal resmi Fourteen Badminton Club. Memuat informasi...
           </div>
 
           <div id="boardEditContainer" class="z-10 pt-2 flex justify-end hide">
-            <button type="button" onclick="openBoardEditModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-900 text-xs font-bold rounded-xl shadow-lg transition-colors flex items-center gap-2">
+            <button type="button" onclick="openBoardEditModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl shadow transition-colors flex items-center gap-2">
               <i class="fas fa-pen-to-square"></i> Update Pengumuman
             </button>
           </div>
@@ -196,81 +332,77 @@
 
         <!-- Kartu Statistik -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-          <div class="bg-white p-4 md:p-5 rounded-3xl shadow-sm border border-slate-200/60 flex flex-col gap-3 transition-transform hover:-translate-y-1">
-            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-wallet"></i></div>
+          <div class="panel-theme p-4 md:p-5 rounded-3xl flex flex-col gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-blue-500/20 text-blue-500 flex items-center justify-center text-lg border border-blue-500/20"><i class="fas fa-wallet"></i></div>
             <div>
-              <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Kas Bersih</p>
-              <p class="text-base md:text-xl font-extrabold text-slate-800 truncate" id="ov-saldo">Rp 0</p>
+              <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider opacity-70 mb-1">Kas Bersih</p>
+              <p class="text-sm sm:text-base md:text-xl font-extrabold truncate" id="ov-saldo">Rp 0</p>
             </div>
           </div>
-          <div class="bg-white p-4 md:p-5 rounded-3xl shadow-sm border border-slate-200/60 flex flex-col gap-3 transition-transform hover:-translate-y-1">
-            <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fas fa-arrow-trend-up"></i></div>
+          <div class="panel-theme p-4 md:p-5 rounded-3xl flex flex-col gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-lg border border-emerald-500/20"><i class="fas fa-arrow-trend-up"></i></div>
             <div>
-              <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Pemasukan</p>
-              <p class="text-base md:text-xl font-extrabold text-emerald-600 truncate" id="ov-masuk">Rp 0</p>
+              <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider opacity-70 mb-1">Pemasukan</p>
+              <p class="text-sm sm:text-base md:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 truncate" id="ov-masuk">Rp 0</p>
             </div>
           </div>
-          <div class="bg-white p-4 md:p-5 rounded-3xl shadow-sm border border-slate-200/60 flex flex-col gap-3 transition-transform hover:-translate-y-1">
-            <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-lg"><i class="fas fa-arrow-trend-down"></i></div>
+          <div class="panel-theme p-4 md:p-5 rounded-3xl flex flex-col gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center text-lg border border-rose-500/20"><i class="fas fa-arrow-trend-down"></i></div>
             <div>
-              <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Pengeluaran</p>
-              <p class="text-base md:text-xl font-extrabold text-rose-600 truncate" id="ov-keluar">Rp 0</p>
+              <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider opacity-70 mb-1">Pengeluaran</p>
+              <p class="text-sm sm:text-base md:text-xl font-extrabold text-rose-600 dark:text-rose-400 truncate" id="ov-keluar">Rp 0</p>
             </div>
           </div>
-          <div class="bg-white p-4 md:p-5 rounded-3xl shadow-sm border border-slate-200/60 flex flex-col gap-3 transition-transform hover:-translate-y-1">
-            <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-lg"><i class="fas fa-users"></i></div>
+          <div class="panel-theme p-4 md:p-5 rounded-3xl flex flex-col gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-500 flex items-center justify-center text-lg border border-purple-500/20"><i class="fas fa-users"></i></div>
             <div>
-              <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Anggota & Sesi</p>
-              <p class="text-base md:text-xl font-extrabold text-slate-800 truncate">
-                <span id="ov-anggota">0</span> <span class="text-[10px] font-semibold text-slate-400">Org</span> 
-                <span class="mx-1 text-slate-300">|</span> 
-                <span id="ov-presensi">0</span> <span class="text-[10px] font-semibold text-slate-400">Sesi</span>
+              <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider opacity-70 mb-1">Anggota & Sesi</p>
+              <p class="text-sm sm:text-base md:text-xl font-extrabold truncate">
+                <span id="ov-anggota">0</span> <span class="text-[10px] font-semibold opacity-70">Org</span> 
+                <span class="mx-1 opacity-40">|</span> 
+                <span id="ov-presensi">0</span> <span class="text-[10px] font-semibold opacity-70">Sesi</span>
               </p>
             </div>
           </div>
         </div>
 
-        <!-- Section Tambahan Overview: Aktivitas & Pintasan -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <!-- Aktivitas Terakhir -->
-          <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200/60 p-5 md:p-6 flex flex-col h-full">
-            <div class="flex items-center gap-3 mb-5 pb-3 border-b border-slate-100">
-              <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center"><i class="fas fa-bolt"></i></div>
-              <h3 class="font-bold text-slate-800 text-base">Aktivitas Terakhir</h3>
+          <div class="lg:col-span-2 panel-theme rounded-3xl p-5 md:p-6 flex flex-col h-full">
+            <div class="flex items-center gap-3 mb-5 pb-3 border-b border-inherit">
+              <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center border border-amber-500/20"><i class="fas fa-bolt"></i></div>
+              <h3 class="font-bold text-base">Aktivitas Terakhir</h3>
             </div>
-            <div id="recentActivityList" class="flex-1 flex flex-col gap-4">
-              <!-- Render by JS -->
-              <p class="text-xs text-slate-400 text-center py-4">Memuat aktivitas...</p>
+            <div id="recentActivityList" class="flex-1 flex flex-col gap-3">
+              <p class="text-xs opacity-70 text-center py-4">Memuat aktivitas...</p>
             </div>
           </div>
 
-          <!-- Akses Cepat -->
-          <div class="bg-white rounded-3xl shadow-sm border border-slate-200/60 p-5 md:p-6 flex flex-col h-full">
-            <div class="flex items-center gap-3 mb-5 pb-3 border-b border-slate-100">
-              <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center"><i class="fas fa-location-arrow"></i></div>
-              <h3 class="font-bold text-slate-800 text-base">Akses Cepat</h3>
+          <div class="panel-theme rounded-3xl p-5 md:p-6 flex flex-col h-full">
+            <div class="flex items-center gap-3 mb-5 pb-3 border-b border-inherit">
+              <div class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-500 flex items-center justify-center border border-indigo-500/20"><i class="fas fa-location-arrow"></i></div>
+              <h3 class="font-bold text-base">Akses Cepat</h3>
             </div>
             <div class="grid grid-cols-1 gap-3">
-              <button onclick="document.querySelector('[data-target=\'view-presensi\']').click()" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 transition-colors group">
+              <button onclick="document.querySelector('[data-target=\'view-presensi\']').click()" class="flex items-center justify-between p-3.5 rounded-2xl btn-theme-alt group">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-clipboard-check"></i></div>
-                  <span class="text-sm font-bold text-slate-700 group-hover:text-blue-700">Cek Daftar Hadir</span>
+                  <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-500 flex items-center justify-center"><i class="fas fa-clipboard-check"></i></div>
+                  <span class="text-sm font-bold">Cek Daftar Hadir</span>
                 </div>
-                <i class="fas fa-chevron-right text-slate-300 text-xs group-hover:text-blue-500"></i>
+                <i class="fas fa-chevron-right opacity-60 text-xs"></i>
               </button>
-              <button onclick="document.querySelector('[data-target=\'view-kas\']').click()" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 transition-colors group">
+              <button onclick="document.querySelector('[data-target=\'view-kas\']').click()" class="flex items-center justify-between p-3.5 rounded-2xl btn-theme-alt group">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center"><i class="fas fa-wallet"></i></div>
-                  <span class="text-sm font-bold text-slate-700 group-hover:text-emerald-700">Laporan Kas</span>
+                  <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center"><i class="fas fa-wallet"></i></div>
+                  <span class="text-sm font-bold">Laporan Kas</span>
                 </div>
-                <i class="fas fa-chevron-right text-slate-300 text-xs group-hover:text-emerald-500"></i>
+                <i class="fas fa-chevron-right opacity-60 text-xs"></i>
               </button>
-              <button onclick="document.querySelector('[data-target=\'view-anggota\']').click()" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-purple-50 hover:border-purple-200 transition-colors group">
+              <button onclick="document.querySelector('[data-target=\'view-ai\']').click()" class="flex items-center justify-between p-3.5 rounded-2xl btn-theme-alt group">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center"><i class="fas fa-users"></i></div>
-                  <span class="text-sm font-bold text-slate-700 group-hover:text-purple-700">Database Anggota</span>
+                  <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center"><i class="fas fa-robot"></i></div>
+                  <span class="text-sm font-bold">Tanya Gemini AI</span>
                 </div>
-                <i class="fas fa-chevron-right text-slate-300 text-xs group-hover:text-purple-500"></i>
+                <i class="fas fa-chevron-right opacity-60 text-xs"></i>
               </button>
             </div>
           </div>
@@ -280,52 +412,52 @@
       <!-- KAS -->
       <div id="view-kas" class="view-section space-y-5 hide">
         <div>
-          <h1 class="text-2xl font-extrabold text-slate-800">Perbendaharaan Kas</h1>
-          <p class="text-slate-500 text-xs md:text-sm font-medium mt-1">Catatan histori keuangan pemasukan dan pengeluaran eskul.</p>
+          <h1 class="text-xl sm:text-2xl font-extrabold">Perbendaharaan Kas</h1>
+          <p class="opacity-70 text-xs md:text-sm font-medium mt-1">Catatan histori keuangan pemasukan dan pengeluaran eskul.</p>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-slate-200/60 role-pengurus-only h-fit">
-            <h3 id="kasFormTitle" class="text-base font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100">Tambah Transaksi Kas</h3>
+          <div class="lg:col-span-1 panel-theme p-5 md:p-6 rounded-3xl role-pengurus-only h-fit">
+            <h3 id="kasFormTitle" class="text-base font-bold mb-4 pb-3 border-b border-inherit">Tambah Transaksi Kas</h3>
             <form id="formKas" class="space-y-4">
               <input type="hidden" id="editKasId">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1.5">Jenis Transaksi</label>
-                <select id="kasTipe" class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all">
+                <label class="block text-xs font-bold opacity-80 mb-1.5">Jenis Transaksi</label>
+                <select id="kasTipe" class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none">
                   <option value="masuk">Pemasukan (+)</option>
                   <option value="keluar">Pengeluaran (-)</option>
                 </select>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nominal (Rp)</label>
-                <input type="number" id="kasNominal" required min="1" class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all" placeholder="Cth: 50000">
+                <label class="block text-xs font-bold opacity-80 mb-1.5">Nominal (Rp)</label>
+                <input type="number" id="kasNominal" required min="1" class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none" placeholder="Cth: 50000">
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1.5">Keterangan / Keperluan</label>
-                <input type="text" id="kasKeterangan" required class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all" placeholder="Cth: Iuran Kas Bulanan">
+                <label class="block text-xs font-bold opacity-80 mb-1.5">Keterangan / Keperluan</label>
+                <input type="text" id="kasKeterangan" required class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none" placeholder="Cth: Iuran Kas Bulanan">
               </div>
               <div class="flex gap-2 pt-2">
-                <button type="submit" id="btnSubmitKas" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-xs transition-colors shadow-lg shadow-blue-500/30">
+                <button type="submit" id="btnSubmitKas" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-xs transition-colors shadow-sm">
                   Simpan Transaksi
                 </button>
-                <button type="button" id="btnCancelKas" onclick="resetKasForm()" class="hide px-4 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors">Batal</button>
+                <button type="button" id="btnCancelKas" onclick="resetKasForm()" class="hide px-4 py-3.5 btn-theme-alt font-bold rounded-xl text-xs transition-colors">Batal</button>
               </div>
             </form>
           </div>
-          <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden flex flex-col min-h-[450px]">
-            <div class="p-5 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
-              <span class="font-bold text-slate-800 text-sm">Riwayat Transaksi Keuangan</span>
+          <div class="lg:col-span-2 panel-theme rounded-3xl overflow-hidden flex flex-col min-h-[450px]">
+            <div class="p-5 panel-light-theme border-b border-inherit flex justify-between items-center">
+              <span class="font-bold text-sm">Riwayat Transaksi Keuangan</span>
             </div>
             <div class="table-wrapper overflow-x-auto flex-1">
-              <table class="w-full text-left border-collapse min-w-[500px]">
+              <table class="w-full text-left border-collapse min-w-[500px] table-theme">
                 <thead>
-                  <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                  <tr class="text-[11px] font-extrabold uppercase tracking-wider">
                     <th class="p-4">Tanggal</th>
                     <th class="p-4">Keterangan</th>
                     <th class="p-4 text-right">Nominal</th>
                     <th class="p-4 text-center role-pengurus-only w-24">Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="tableKas" class="divide-y divide-slate-100 text-xs md:text-sm font-medium"></tbody>
+                <tbody id="tableKas" class="divide-y text-xs md:text-sm font-medium"></tbody>
               </table>
             </div>
           </div>
@@ -336,24 +468,24 @@
       <div id="view-presensi" class="view-section space-y-5 hide">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-extrabold text-slate-800">Daftar Hadir Latihan</h1>
-            <p class="text-slate-500 text-xs md:text-sm font-medium mt-1">Riwayat pertemuan dan presensi latihan anggota.</p>
+            <h1 class="text-xl sm:text-2xl font-extrabold">Daftar Hadir Latihan</h1>
+            <p class="opacity-70 text-xs md:text-sm font-medium mt-1">Riwayat pertemuan dan presensi latihan anggota.</p>
           </div>
           <div class="flex flex-wrap items-center gap-3">
-            <button type="button" onclick="exportPresensiExcel()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 transition-all">
+            <button type="button" onclick="exportPresensiExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors">
               <i class="fas fa-file-excel text-base"></i> Ekspor Excel
             </button>
-            <button type="button" onclick="openPresensiModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all role-pengurus-only">
+            <button type="button" onclick="openPresensiModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors role-pengurus-only">
               <i class="fas fa-plus text-base"></i> Tambah Pertemuan
             </button>
           </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden flex flex-col min-h-[500px]">
+        <div class="panel-theme rounded-3xl overflow-hidden flex flex-col min-h-[500px]">
           <div class="table-wrapper overflow-x-auto flex-1">
-            <table class="w-full text-left border-collapse min-w-[650px]">
+            <table class="w-full text-left border-collapse min-w-[650px] table-theme">
               <thead>
-                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                <tr class="text-[11px] font-extrabold uppercase tracking-wider">
                   <th class="p-4">Tanggal</th>
                   <th class="p-4">Materi Latihan</th>
                   <th class="p-4 text-center">Kehadiran (H/I/S/A)</th>
@@ -362,7 +494,7 @@
                   <th class="p-4 text-center role-pengurus-only w-24">Aksi</th>
                 </tr>
               </thead>
-              <tbody id="tablePresensi" class="divide-y divide-slate-100 text-xs md:text-sm font-medium"></tbody>
+              <tbody id="tablePresensi" class="divide-y text-xs md:text-sm font-medium"></tbody>
             </table>
           </div>
         </div>
@@ -372,76 +504,74 @@
       <div id="view-anggota" class="view-section space-y-5 hide">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-extrabold text-slate-800">Data Anggota Eskul</h1>
-            <p class="text-slate-500 text-xs md:text-sm font-medium mt-1">Manajemen database siswa dan rekap kehadiran global.</p>
+            <h1 class="text-xl sm:text-2xl font-extrabold">Data Anggota Eskul</h1>
+            <p class="opacity-70 text-xs md:text-sm font-medium mt-1">Manajemen database siswa dan rekap kehadiran global.</p>
           </div>
-          <button type="button" onclick="exportAnggotaExcel()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 transition-all self-start md:self-auto">
+          <button type="button" onclick="exportAnggotaExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors self-start md:self-auto">
             <i class="fas fa-file-excel text-base"></i> Ekspor Data
           </button>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div class="lg:col-span-1 space-y-5">
-            <!-- Form Satuan -->
-            <div class="bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-slate-200/60 role-pengurus-only">
-              <h3 id="anggotaFormTitle" class="text-base font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100">Tambah Siswa</h3>
+            <div class="panel-theme p-5 md:p-6 rounded-3xl role-pengurus-only">
+              <h3 id="anggotaFormTitle" class="text-base font-bold mb-4 pb-3 border-b border-inherit">Tambah Siswa</h3>
               <form id="formAnggota" class="space-y-4">
                 <input type="hidden" id="editAnggotaId">
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Lengkap</label>
-                  <input type="text" id="angNama" required class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all" placeholder="Cth: Ahmad Rizky">
+                  <label class="block text-xs font-bold opacity-80 mb-1.5">Nama Lengkap</label>
+                  <input type="text" id="angNama" required class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none" placeholder="Cth: Ahmad Rizky">
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1.5">Kelas</label>
-                  <input type="text" id="angKelas" required class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all" placeholder="Cth: XI-7">
+                  <label class="block text-xs font-bold opacity-80 mb-1.5">Kelas</label>
+                  <input type="text" id="angKelas" required class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none" placeholder="Cth: XI-7">
                 </div>
                 <div class="flex gap-2 pt-2">
-                  <button type="submit" id="btnSubmitAnggota" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-xs transition-colors shadow-lg shadow-blue-500/30">
+                  <button type="submit" id="btnSubmitAnggota" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-xs transition-colors shadow-sm">
                     Simpan Siswa
                   </button>
-                  <button type="button" id="btnCancelAnggota" onclick="resetAnggotaForm()" class="hide px-4 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors">Batal</button>
+                  <button type="button" id="btnCancelAnggota" onclick="resetAnggotaForm()" class="hide px-4 py-3.5 btn-theme-alt font-bold rounded-xl text-xs transition-colors">Batal</button>
                 </div>
               </form>
             </div>
 
-            <!-- Import Excel -->
-            <div class="bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-emerald-100 bg-gradient-to-b from-emerald-50/50 to-white role-pengurus-only">
-              <h3 class="text-base font-bold text-slate-800 mb-3 pb-3 border-b border-emerald-100 flex items-center gap-2">
+            <div class="panel-theme p-5 md:p-6 rounded-3xl border border-emerald-500/20 bg-emerald-950/10 role-pengurus-only">
+              <h3 class="text-base font-bold mb-3 pb-3 border-b border-emerald-500/20 flex items-center gap-2">
                 <i class="fas fa-file-excel text-emerald-500"></i> Impor Massal (.xlsx)
               </h3>
               <div class="space-y-3">
-                <button type="button" onclick="downloadExcelTemplate()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-3 rounded-xl border border-slate-200 text-xs transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <button type="button" onclick="downloadExcelTemplate()" class="w-full btn-theme-alt font-bold py-2.5 px-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 shadow-sm">
                   <i class="fas fa-download text-blue-500"></i> Unduh Format Template
                 </button>
-                <input type="file" id="excelFile" accept=".xlsx, .xls" class="w-full text-xs text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-700 hover:file:bg-emerald-200 border border-slate-200 rounded-xl cursor-pointer bg-white">
-                <button type="button" onclick="processExcelUpload()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs transition-colors shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2">
+                <input type="file" id="excelFile" accept=".xlsx, .xls" class="w-full text-xs opacity-80 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-500/20 file:text-emerald-500 border border-inherit rounded-xl cursor-pointer">
+                <button type="button" onclick="processExcelUpload()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition-colors shadow-sm flex items-center justify-center gap-2">
                   <i class="fas fa-upload"></i> Proses & Unggah
                 </button>
               </div>
             </div>
           </div>
 
-          <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden flex flex-col min-h-[450px]">
-            <div class="p-4 bg-slate-50/50 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
-              <span class="font-bold text-slate-800 text-sm px-1">Daftar Siswa Terdaftar</span>
+          <div class="lg:col-span-2 panel-theme rounded-3xl overflow-hidden flex flex-col min-h-[450px]">
+            <div class="p-4 panel-light-theme border-b border-inherit flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+              <span class="font-bold text-sm px-1">Daftar Siswa Terdaftar</span>
               <div class="relative">
-                <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                <input type="text" id="searchAnggotaInput" oninput="renderTable('anggota')" placeholder="Cari nama/kelas..." class="w-full sm:w-64 pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all shadow-sm">
+                <i class="fas fa-search absolute left-3.5 top-3 opacity-60 text-xs"></i>
+                <input type="text" id="searchAnggotaInput" oninput="renderTable('anggota')" placeholder="Cari nama/kelas..." class="w-full sm:w-64 pl-9 pr-4 py-2 input-theme rounded-xl text-xs font-medium outline-none">
               </div>
             </div>
             <div class="table-wrapper overflow-x-auto flex-1">
-              <table class="w-full text-left border-collapse min-w-[550px]">
+              <table class="w-full text-left border-collapse min-w-[550px] table-theme">
                 <thead>
-                  <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                  <tr class="text-[11px] font-extrabold uppercase tracking-wider">
                     <th class="p-4">Nama Lengkap</th>
                     <th class="p-4">Kelas</th>
-                    <th class="p-4 text-center text-emerald-600">Hadir</th>
-                    <th class="p-4 text-center text-blue-600">Izin</th>
-                    <th class="p-4 text-center text-amber-600">Sakit</th>
-                    <th class="p-4 text-center text-rose-600">Alpa</th>
+                    <th class="p-4 text-center text-emerald-500">Hadir</th>
+                    <th class="p-4 text-center text-blue-500">Izin</th>
+                    <th class="p-4 text-center text-amber-500">Sakit</th>
+                    <th class="p-4 text-center text-rose-500">Alpa</th>
                     <th class="p-4 text-center role-pengurus-only w-24">Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="tableAnggota" class="divide-y divide-slate-100 text-xs md:text-sm font-medium"></tbody>
+                <tbody id="tableAnggota" class="divide-y text-xs md:text-sm font-medium"></tbody>
               </table>
             </div>
           </div>
@@ -452,31 +582,31 @@
       <div id="view-nilai" class="view-section space-y-5 hide">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-extrabold text-slate-800">Penilaian Eskul</h1>
-            <p class="text-slate-500 text-xs md:text-sm font-medium mt-1">Evaluasi massal anggota (Khusus Pembina).</p>
+            <h1 class="text-xl sm:text-2xl font-extrabold">Penilaian Eskul</h1>
+            <p class="opacity-70 text-xs md:text-sm font-medium mt-1">Evaluasi massal anggota (Khusus Pembina).</p>
           </div>
           <div class="flex items-center gap-3 self-start md:self-auto">
             <div class="relative hidden sm:block">
-              <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-              <input type="text" id="searchNilaiInput" oninput="renderBulkNilaiForm()" placeholder="Cari siswa..." class="w-60 pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-amber-500 bg-white shadow-sm">
+              <i class="fas fa-search absolute left-3.5 top-3 opacity-60 text-xs"></i>
+              <input type="text" id="searchNilaiInput" oninput="renderBulkNilaiForm()" placeholder="Cari siswa..." class="w-60 pl-9 pr-4 py-2.5 input-theme rounded-xl text-xs font-medium outline-none">
             </div>
-            <button type="button" onclick="exportNilaiExcel()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-amber-500/30 transition-all">
+            <button type="button" onclick="exportNilaiExcel()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors">
               <i class="fas fa-file-excel text-base"></i> Ekspor Excel
             </button>
           </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
-          <div class="p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div class="flex items-center gap-2.5 text-amber-900 font-extrabold text-sm">
+        <div class="panel-theme rounded-3xl overflow-hidden">
+          <div class="p-5 bg-amber-500/10 border-b border-amber-500/20 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 text-amber-600 dark:text-amber-200 font-extrabold text-sm">
               <i class="fas fa-award text-amber-500 text-lg"></i> Lembar Evaluasi Seluruh Siswa
             </div>
-            <span class="text-[11px] text-amber-700 font-bold bg-amber-200/50 px-3 py-1.5 rounded-lg role-pembina-only inline-block w-fit">Mode Edit Aktif</span>
+            <span class="text-[11px] text-amber-600 dark:text-amber-300 font-bold bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-lg role-pembina-only inline-block w-fit">Mode Edit Aktif</span>
           </div>
           <form id="formBulkNilai" class="space-y-0">
             <div class="table-wrapper overflow-x-auto max-h-[600px]">
-              <table class="w-full text-left border-collapse min-w-[750px]">
-                <thead class="sticky top-0 bg-slate-50 z-10 border-b border-slate-200 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider shadow-sm">
+              <table class="w-full text-left border-collapse min-w-[750px] table-theme">
+                <thead class="sticky top-0 z-10">
                   <tr>
                     <th class="p-4 w-12 text-center">No</th>
                     <th class="p-4">Nama Siswa</th>
@@ -486,167 +616,261 @@
                     <th class="p-4 text-center role-pembina-only w-16">Save</th>
                   </tr>
                 </thead>
-                <tbody id="bulkNilaiTbody" class="divide-y divide-slate-100 text-xs md:text-sm font-medium"></tbody>
+                <tbody id="bulkNilaiTbody" class="divide-y text-xs md:text-sm font-medium"></tbody>
               </table>
             </div>
-            <div class="p-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 role-pembina-only">
-              <span class="text-xs font-medium text-slate-500 text-center sm:text-left">Pastikan tidak ada isian nilai yang terlewat sebelum menyimpan massal.</span>
-              <button type="submit" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white font-bold px-6 py-3.5 rounded-xl text-xs shadow-lg transition-all flex items-center justify-center gap-2">
-                <i class="fas fa-floppy-disk text-amber-400"></i> Simpan Seluruh Penilaian
+            <div class="p-5 panel-light-theme border-t border-inherit flex flex-col sm:flex-row justify-between items-center gap-4 role-pembina-only">
+              <span class="text-xs font-medium opacity-70 text-center sm:text-left">Pastikan tidak ada isian nilai yang terlewat sebelum menyimpan massal.</span>
+              <button type="submit" class="w-full sm:w-auto btn-theme-alt font-bold px-6 py-3.5 rounded-xl text-xs transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-floppy-disk text-amber-500"></i> Simpan Seluruh Penilaian
               </button>
             </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- GEMINI AI ASSISTANT VIEW -->
+      <div id="view-ai" class="view-section space-y-5 hide">
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold flex items-center gap-3">
+            <i class="fas fa-robot text-purple-400"></i> Gemini AI Assistant
+          </h1>
+          <p class="opacity-70 text-xs md:text-sm font-medium mt-1">Asisten pintar Fourteen Badminton Club yang terhubung dengan data portal Anda.</p>
+        </div>
+
+        <div class="panel-theme rounded-3xl overflow-hidden flex flex-col h-[650px] shadow-xl">
+          <!-- Chat Header -->
+          <div class="p-4 panel-light-theme border-b border-inherit flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+                <i class="fas fa-brain"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-sm">FBC Intelligence Agent</h3>
+                <p class="text-[10px] opacity-70">Powered by Gemini 2.5 Flash</p>
+              </div>
+            </div>
+            <button onclick="clearChatHistory()" class="btn-theme-alt px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+              <i class="fas fa-trash-can"></i> Bersihkan Chat
+            </button>
+          </div>
+
+          <!-- Chat Messages Container -->
+          <div id="chatMessages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/30">
+                <i class="fas fa-robot text-xs"></i>
+              </div>
+              <div class="panel-light-theme p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed border border-inherit shadow-sm">
+                Halo! Saya adalah asisten AI Fourteen Badminton Club. Saya dapat membantu Anda menganalisis data kas, rekap presensi anggota, menyusun program latihan, atau menjawab pertanyaan umum seputar eskul. Ada yang bisa saya bantu hari ini?
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Suggestion Chips -->
+          <div class="px-4 py-2 border-t border-inherit flex items-center gap-2 overflow-x-auto text-xs bg-black/5">
+            <span class="text-[10px] uppercase font-bold opacity-60 whitespace-nowrap">Saran:</span>
+            <button onclick="sendQuickPrompt('Berapa saldo kas saat ini dan bagaimana ringkasannya?')" class="px-3 py-1.5 rounded-lg btn-theme-alt whitespace-nowrap font-medium text-[11px]">💰 Rekap Kas</button>
+            <button onclick="sendQuickPrompt('Siapa saja anggota yang tingkat kehadirannya paling tinggi?')" class="px-3 py-1.5 rounded-lg btn-theme-alt whitespace-nowrap font-medium text-[11px]">👥 Kehadiran Anggota</button>
+            <button onclick="sendQuickPrompt('Berikan rekomendasi menu latihan teknik footwork dan smash untuk minggu ini.')" class="px-3 py-1.5 rounded-lg btn-theme-alt whitespace-nowrap font-medium text-[11px]">🏸 Program Latihan</button>
+          </div>
+
+          <!-- Chat Input Form -->
+          <form id="chatForm" onsubmit="handleChatSubmit(event)" class="p-4 panel-light-theme border-t border-inherit flex items-center gap-3">
+            <input type="text" id="chatInput" autocomplete="off" placeholder="Tulis pesan atau tanyakan sesuatu pada AI..." class="flex-1 px-4 py-3 input-theme rounded-2xl text-xs sm:text-sm font-medium outline-none">
+            <button type="submit" id="chatSubmitBtn" class="w-12 h-12 bg-purple-600 hover:bg-purple-500 text-white rounded-2xl flex items-center justify-center shrink-0 transition-colors shadow-sm">
+              <i class="fas fa-paper-plane text-sm"></i>
+            </button>
           </form>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- MODALS (Struktur sama, styling disesuaikan) -->
-  <div id="presensiModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hide p-4 transition-opacity">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl p-6 md:p-8 transform transition-all relative flex flex-col max-h-[90vh]">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+  <!-- MODALS -->
+  <div id="presensiModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 hide p-4">
+    <div class="panel-theme rounded-3xl shadow-2xl w-full max-w-2xl p-6 md:p-8 relative flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-inherit mb-5">
         <div>
-          <h3 id="presensiModalTitle" class="text-xl font-extrabold text-slate-800">Catat Pertemuan</h3>
-          <p class="text-xs font-medium text-slate-500 mt-1">Atur presensi anggota untuk sesi ini.</p>
+          <h3 id="presensiModalTitle" class="text-xl font-extrabold">Catat Pertemuan</h3>
+          <p class="text-xs font-medium opacity-70 mt-1">Atur presensi anggota untuk sesi ini.</p>
         </div>
-        <button type="button" onclick="closePresensiModal()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-xmark text-lg"></i></button>
+        <button type="button" onclick="closePresensiModal()" class="w-10 h-10 btn-theme-alt rounded-full flex items-center justify-center transition-colors"><i class="fas fa-xmark text-lg"></i></button>
       </div>
-      <form id="formPresensi" class="flex-1 overflow-y-auto pr-2 space-y-5 custom-scroll">
+      <form id="formPresensi" class="flex-1 overflow-y-auto pr-2 space-y-5">
         <input type="hidden" id="editPresensiId">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1.5">Tanggal</label>
-            <input type="date" id="preTanggal" required class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+            <label class="block text-xs font-bold opacity-80 mb-1.5">Tanggal</label>
+            <input type="date" id="preTanggal" required class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1.5">Materi Latihan</label>
-            <input type="text" id="preMateri" required class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50" placeholder="Cth: Drill & Game">
+            <label class="block text-xs font-bold opacity-80 mb-1.5">Materi Latihan</label>
+            <input type="text" id="preMateri" required class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none" placeholder="Cth: Drill & Game">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Dokumentasi (Opsional, Max 2MB)</label>
-          <input type="file" id="preFile" accept="image/*,.pdf" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 border border-slate-200 rounded-xl cursor-pointer bg-white">
+          <label class="block text-xs font-bold opacity-80 mb-1.5">Dokumentasi (Opsional, Max 2MB)</label>
+          <input type="file" id="preFile" accept="image/*,.pdf" class="w-full text-xs opacity-80 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-500/20 file:text-blue-500 border border-inherit rounded-xl cursor-pointer">
         </div>
-        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+        <div class="panel-light-theme rounded-2xl p-4 border border-inherit">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-            <label class="block text-xs font-bold text-slate-700">Status Kehadiran Siswa</label>
+            <label class="block text-xs font-bold">Status Kehadiran Siswa</label>
             <div class="flex gap-2">
-              <button type="button" onclick="setAllAttendanceStatus('hadir')" class="text-[10px] bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-200 transition-colors">Semua Hadir</button>
-              <button type="button" onclick="setAllAttendanceStatus('alpa')" class="text-[10px] bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg font-bold hover:bg-rose-200 transition-colors">Semua Alpa</button>
+              <button type="button" onclick="setAllAttendanceStatus('hadir')" class="text-[10px] bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg font-bold">Semua Hadir</button>
+              <button type="button" onclick="setAllAttendanceStatus('alpa')" class="text-[10px] bg-rose-500/20 border border-rose-500/30 text-rose-600 dark:text-rose-400 px-3 py-1.5 rounded-lg font-bold">Semua Alpa</button>
             </div>
           </div>
           <div class="relative mb-4">
-            <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-            <input type="text" id="searchModalPresensi" oninput="renderModalPresensiStudents()" placeholder="Cari siswa..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-xs font-medium outline-none bg-white">
+            <i class="fas fa-search absolute left-3.5 top-3 opacity-60 text-xs"></i>
+            <input type="text" id="searchModalPresensi" oninput="renderModalPresensiStudents()" placeholder="Cari siswa..." class="w-full pl-9 pr-4 py-2 input-theme rounded-xl text-xs font-medium outline-none">
           </div>
-          <div id="modalPresensiListContainer" class="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scroll">
-            <p class="text-xs text-slate-400 text-center py-6">Belum ada data anggota.</p>
+          <div id="modalPresensiListContainer" class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+            <p class="text-xs opacity-70 text-center py-6">Belum ada data anggota.</p>
           </div>
         </div>
       </form>
-      <div class="pt-5 mt-2 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-3 shrink-0">
-        <button type="button" onclick="closePresensiModal()" class="w-full sm:w-auto px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors">Batal</button>
-        <button type="submit" form="formPresensi" id="btnSubmitPresensiModal" class="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-colors">Simpan Sesi</button>
+      <div class="pt-5 mt-2 border-t border-inherit flex flex-col sm:flex-row justify-end gap-3 shrink-0">
+        <button type="button" onclick="closePresensiModal()" class="w-full sm:w-auto px-6 py-3.5 btn-theme-alt font-bold rounded-xl transition-colors text-xs">Batal</button>
+        <button type="submit" form="formPresensi" id="btnSubmitPresensiModal" class="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow transition-colors text-xs">Simpan Sesi</button>
       </div>
     </div>
   </div>
 
-  <div id="boardEditModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hide p-4">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-6 md:p-8 transform transition-all relative">
-      <button type="button" onclick="closeBoardEditModal()" class="absolute top-6 right-6 w-8 h-8 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-xmark text-sm"></i></button>
-      <h3 class="text-xl font-extrabold text-slate-800 mb-1">Update Pengumuman</h3>
-      <p class="text-xs font-medium text-slate-500 mb-6">Informasi tampil di halaman Overview publik.</p>
+  <div id="boardEditModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 hide p-4">
+    <div class="panel-theme rounded-3xl shadow-2xl w-full max-w-md p-6 md:p-8 relative">
+      <button type="button" onclick="closeBoardEditModal()" class="absolute top-6 right-6 w-8 h-8 btn-theme-alt rounded-full flex items-center justify-center"><i class="fas fa-xmark text-sm"></i></button>
+      <h3 class="text-xl font-extrabold mb-1">Update Pengumuman</h3>
+      <p class="text-xs font-medium opacity-70 mb-6">Informasi tampil di halaman Overview publik.</p>
       <form id="boardEditForm" class="space-y-5">
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Judul Pengumuman</label>
-          <input type="text" id="inputBoardTitle" required class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+          <label class="block text-xs font-bold opacity-80 mb-1.5">Judul Pengumuman</label>
+          <input type="text" id="inputBoardTitle" required class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Isi Informasi</label>
-          <textarea id="inputBoardContent" required rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 resize-y"></textarea>
+          <label class="block text-xs font-bold opacity-80 mb-1.5">Isi Informasi</label>
+          <textarea id="inputBoardContent" required rows="5" class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none resize-y"></textarea>
         </div>
         <div class="flex gap-3 pt-2">
-          <button type="button" onclick="closeBoardEditModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl text-xs transition-colors">Batal</button>
-          <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3.5 rounded-xl text-xs transition-colors shadow-lg shadow-amber-500/30">Publikasikan</button>
+          <button type="button" onclick="closeBoardEditModal()" class="flex-1 btn-theme-alt font-bold py-3.5 rounded-xl text-xs transition-colors">Batal</button>
+          <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3.5 rounded-xl text-xs transition-colors shadow">Publikasikan</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div id="loginModal" class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hide p-4">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-7 md:p-9 transform transition-all relative">
-      <button type="button" onclick="hideLoginModal()" class="absolute top-5 right-5 w-8 h-8 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-xmark text-sm"></i></button>
+  <div id="loginModal" class="fixed inset-0 z-[70] flex items-center justify-center bg-black/75 hide p-4">
+    <div class="panel-theme rounded-3xl shadow-2xl w-full max-w-sm p-7 md:p-9 relative">
+      <button type="button" onclick="hideLoginModal()" class="absolute top-5 right-5 w-8 h-8 btn-theme-alt rounded-full flex items-center justify-center"><i class="fas fa-xmark text-sm"></i></button>
       <div class="text-center mb-8">
-        <div class="w-20 h-20 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-3xl flex items-center justify-center p-3 mx-auto mb-4 shadow-inner">
+        <div class="w-20 h-20 panel-light-theme border border-inherit rounded-3xl flex items-center justify-center p-3 mx-auto mb-4 shadow">
           <img src="https://i.postimg.cc/hhFCvNCZ/logo-fourteen-jpg.jpg" onerror="this.src='https://ui-avatars.com/api/?name=FBC&background=0D8ABC&color=fff&size=100';" alt="Logo" class="logo-img rounded-xl">
         </div>
-        <h2 class="text-2xl font-extrabold text-slate-800">Akses Portal</h2>
-        <p class="text-slate-500 text-xs font-medium mt-1.5">Otorisasi Pengurus & Pembina</p>
+        <h2 class="text-2xl font-extrabold">Akses Portal</h2>
+        <p class="opacity-70 text-xs font-medium mt-1.5">Otorisasi Pengurus & Pembina</p>
       </div>
       <form id="loginForm" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Username</label>
+          <label class="block text-xs font-bold opacity-80 mb-1.5">Username</label>
           <div class="relative">
-            <i class="fas fa-user absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-            <input type="text" id="usernameInput" required class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50" placeholder="PENGURUS / PEMBINA">
+            <i class="fas fa-user absolute left-4 top-3.5 opacity-60 text-sm"></i>
+            <input type="text" id="usernameInput" required class="w-full pl-10 pr-4 py-3 input-theme rounded-xl text-sm font-medium outline-none" placeholder="PENGURUS / PEMBINA">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Password</label>
+          <label class="block text-xs font-bold opacity-80 mb-1.5">Password</label>
           <div class="relative">
-            <i class="fas fa-lock absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-            <input type="password" id="passwordInput" required class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50" placeholder="••••••••">
+            <i class="fas fa-lock absolute left-4 top-3.5 opacity-60 text-sm"></i>
+            <input type="password" id="passwordInput" required class="w-full pl-10 pr-4 py-3 input-theme rounded-xl text-sm font-medium outline-none" placeholder="••••••••">
           </div>
         </div>
-        <div id="loginError" class="text-rose-600 text-[11px] hidden text-center font-bold bg-rose-50 py-2.5 rounded-lg border border-rose-100">
+        <div id="loginError" class="text-rose-500 text-[11px] hidden text-center font-bold bg-rose-500/25 py-2.5 rounded-lg border border-rose-500/30">
           Username atau Password tidak valid!
         </div>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-blue-500/30 mt-2">
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-sm transition-colors shadow mt-2">
           Verifikasi Akses
         </button>
       </form>
     </div>
   </div>
 
-  <div id="detailPresensiModal" class="fixed inset-0 z-[65] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hide p-4">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl p-6 md:p-8 transform transition-all relative flex flex-col max-h-[85vh]">
-      <button type="button" onclick="hideDetailPresensiModal()" class="absolute top-6 right-6 w-8 h-8 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-xmark text-sm"></i></button>
-      <div class="mb-5 pb-4 border-b border-slate-100 pr-10">
-        <h3 class="text-xl font-extrabold text-slate-800" id="detailPresensiTitle">Detail Pertemuan</h3>
-        <p class="text-xs font-medium text-slate-500 mt-1.5 flex items-center gap-2">
+  <div id="detailPresensiModal" class="fixed inset-0 z-[65] flex items-center justify-center bg-black/75 hide p-4">
+    <div class="panel-theme rounded-3xl shadow-2xl w-full max-w-2xl p-6 md:p-8 relative flex flex-col max-h-[85vh]">
+      <button type="button" onclick="hideDetailPresensiModal()" class="absolute top-6 right-6 w-8 h-8 btn-theme-alt rounded-full flex items-center justify-center"><i class="fas fa-xmark text-sm"></i></button>
+      <div class="mb-5 pb-4 border-b border-inherit pr-10">
+        <h3 class="text-xl font-extrabold" id="detailPresensiTitle">Detail Pertemuan</h3>
+        <p class="text-xs font-medium opacity-70 mt-1.5 flex items-center gap-2">
           <i class="fas fa-calendar-day text-blue-500"></i> <span id="detailPresensiSub"></span>
         </p>
       </div>
-      <div class="flex-1 overflow-y-auto space-y-2 pr-2 custom-scroll bg-slate-50/50 rounded-2xl p-4 border border-slate-100" id="detailPresensiList"></div>
-      <div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-3 shrink-0">
-        <button type="button" onclick="hideDetailPresensiModal()" class="w-full sm:w-auto px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors">Tutup</button>
-        <button type="button" id="btnExportDetail" class="w-full sm:w-auto px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 transition-colors">
+      <div class="flex-1 overflow-y-auto space-y-2 pr-2 panel-light-theme rounded-2xl p-4 border border-inherit" id="detailPresensiList"></div>
+      <div class="mt-5 pt-4 border-t border-inherit flex flex-col sm:flex-row items-center justify-end gap-3 shrink-0">
+        <button type="button" onclick="hideDetailPresensiModal()" class="w-full sm:w-auto px-6 py-3.5 btn-theme-alt font-bold rounded-xl transition-colors text-xs">Tutup</button>
+        <button type="button" id="btnExportDetail" class="w-full sm:w-auto px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow transition-colors text-xs">
           <i class="fas fa-file-excel"></i> Ekspor Sesi Ini
         </button>
       </div>
     </div>
   </div>
 
-  <div id="previewFileModal" class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/95 hide p-4 backdrop-blur-md">
+  <div id="previewFileModal" class="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 hide p-4">
     <div class="w-full max-w-3xl flex flex-col items-center">
       <div class="w-full flex justify-end mb-4">
-        <button type="button" onclick="hidePreviewFileModal()" class="text-white hover:text-red-400 transition-colors flex items-center gap-2 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+        <button type="button" onclick="hidePreviewFileModal()" class="text-white hover:text-rose-500 transition-colors flex items-center gap-2 font-bold text-sm btn-theme-alt px-5 py-2 rounded-full">
           <i class="fas fa-xmark"></i> Tutup
         </button>
       </div>
-      <div class="w-full bg-slate-800/50 rounded-3xl p-2 flex items-center justify-center min-h-[300px] border border-white/10 shadow-2xl" id="previewFileContainer"></div>
+      <div class="w-full panel-theme rounded-3xl p-3 flex items-center justify-center min-h-[300px] shadow-2xl" id="previewFileContainer"></div>
     </div>
   </div>
 
-  <div id="toastNotif" class="toast px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
-    <i class="fas fa-circle-check text-emerald-400 text-xl" id="toastIcon"></i>
-    <span id="toastMsg" class="font-bold text-xs md:text-sm text-white">Notifikasi</span>
+  <div id="toastNotif" class="toast panel-theme px-5 py-4 rounded-2xl shadow-xl flex items-center gap-3 border border-inherit">
+    <i class="fas fa-circle-check text-emerald-500 text-xl" id="toastIcon"></i>
+    <span id="toastMsg" class="font-bold text-xs md:text-sm">Notifikasi</span>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { GoogleGenAI } from "https://esm.run/@google/genai";
+
+    // --- INISIALISASI TEMA BERDASARKAN WAKTU PERANGKAT ---
+    function initAutoTheme() {
+      const currentHour = new Date().getHours();
+      const isDayTime = currentHour >= 6 && currentHour < 18;
+      applyTheme(isDayTime ? 'light' : 'dark', false);
+    }
+
+    window.toggleThemeManual = () => {
+      const isDark = document.body.classList.contains('theme-dark');
+      applyTheme(isDark ? 'light' : 'dark', true);
+    };
+
+    function applyTheme(mode, manual = false) {
+      const bodyEl = document.body;
+      const tBtnText = document.getElementById('themeTextBtn');
+      const tIconBtn = document.getElementById('themeIconBtn');
+      const tIconMob = document.getElementById('themeIconMobile');
+
+      if (mode === 'light') {
+        bodyEl.classList.remove('theme-dark');
+        bodyEl.classList.add('theme-light');
+        if(tBtnText) tBtnText.innerText = "Mode Terang (Aktif)";
+        if(tIconBtn) tIconBtn.className = "fas fa-sun text-amber-500";
+        if(tIconMob) tIconMob.className = "fas fa-sun text-amber-500";
+      } else {
+        bodyEl.classList.remove('theme-light');
+        bodyEl.classList.add('theme-dark');
+        if(tBtnText) tBtnText.innerText = "Mode Gelap (Aktif)";
+        if(tIconBtn) tIconBtn.className = "fas fa-moon text-blue-400";
+        if(tIconMob) tIconMob.className = "fas fa-moon text-blue-400";
+      }
+      if(manual) {
+        showToast(`Tema diubah ke ${mode === 'light' ? 'Terang' : 'Gelap'}`, "info");
+      }
+    }
+    initAutoTheme();
 
     const ACCOUNTS = {
       "PENGURUSESKUL": { pass: "FBC2K26", role: "pengurus", label: "Pengurus Eskul" },
@@ -674,7 +898,10 @@
     const paths = { kas: 'kas', presensi: 'presensi', anggota: 'anggota', nilai: 'nilai', board: 'board' };
     let dataStore = { kas: [], presensi: [], anggota: [], nilai: [], board: { title: "Jadwal & Pengumuman", content: "Memuat informasi..." } };
 
-    // --- LOADER LOGIC ---
+    // --- INISIALISASI GEMINI SDK ---
+    const ai = new GoogleGenAI({ apiKey: "AIzaSyBkcmiXH_VdY4ARHb4hSb8_7Itn3TbHemY" });
+    let chatSessionInstance = null;
+
     window.showLoader = (text = "Memproses...") => {
       document.getElementById('actionLoaderText').innerText = text;
       document.getElementById('actionLoader').classList.remove('hide');
@@ -684,11 +911,13 @@
     };
 
     window.addEventListener('load', () => {
+      const video = document.getElementById('introVideo');
+      if (video) { video.play().catch(() => {}); }
       setTimeout(() => {
         const loader = document.getElementById('globalLoader');
         loader.style.opacity = '0';
         setTimeout(() => loader.classList.add('hide'), 500);
-      }, 2000);
+      }, 1500);
     });
 
     async function initApp() {
@@ -699,8 +928,25 @@
         isMockMode = true;
         renderAll();
       }
+      initGeminiChat();
     }
     initApp();
+
+    function initGeminiChat() {
+      try {
+        const systemInstruction = `Anda adalah FBC Assistant, AI pintar untuk Fourteen Badminton Club (FBC), sebuah ekstrakurikuler bulu tangkis di SMAN 14 Surabaya. Tugas Anda adalah membantu pengurus, pembina, maupun anggota dalam menganalisis data keuangan kas, rekap presensi kehadiran latihan, memberikan program latihan bulu tangkis yang efektif (seperti drill, footwork, smash, taktik ganda/tunggal), serta menjawab pertanyaan seputar manajemen eskul. Jawablah dengan ramah, profesional, menggunakan bahasa Indonesia yang baik, dan manfaatkan data real-time klub yang tersedia pada konteks sistem bila diperlukan.`;
+        
+        chatSessionInstance = ai.chats.create({
+          model: 'gemini-2.5-flash',
+          config: {
+            systemInstruction: systemInstruction,
+            temperature: 0.7,
+          }
+        });
+      } catch (err) {
+        console.error("Gagal menginisialisasi Gemini chat:", err);
+      }
+    }
 
     window.toggleMobileMenu = () => {
       document.getElementById('appSidebar').classList.toggle('mobile-open');
@@ -724,7 +970,6 @@
         userLabel.innerText = "Mode Publik";
         roleLabel.innerText = "Lihat Saja";
         roleIcon.innerHTML = '<i class="fas fa-user"></i>';
-        roleIcon.className = "w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400";
         if(boardEditContainer) boardEditContainer.classList.add('hide');
       } else if (currentRole === 'pengurus') {
         document.querySelectorAll('.role-pengurus-only').forEach(el => el.classList.remove('hide'));
@@ -734,7 +979,6 @@
         userLabel.innerText = "Pengurus Eskul";
         roleLabel.innerText = "Akses Manajerial";
         roleIcon.innerHTML = '<i class="fas fa-user-shield"></i>';
-        roleIcon.className = "w-10 h-10 rounded-xl bg-blue-600 border border-blue-400 flex items-center justify-center text-white shadow-md shadow-blue-500/30";
         if(boardEditContainer) boardEditContainer.classList.remove('hide');
       } else if (currentRole === 'pembina') {
         document.querySelectorAll('.role-pembina-only').forEach(el => el.classList.remove('hide'));
@@ -744,7 +988,6 @@
         userLabel.innerText = "Pembina Eskul";
         roleLabel.innerText = "Akses Evaluator";
         roleIcon.innerHTML = '<i class="fas fa-award"></i>';
-        roleIcon.className = "w-10 h-10 rounded-xl bg-amber-500 border border-amber-400 flex items-center justify-center text-white shadow-md shadow-amber-500/30";
         if(boardEditContainer) boardEditContainer.classList.add('hide');
       }
       renderAll();
@@ -774,7 +1017,7 @@
           err.classList.remove('hidden');
         }
         hideLoader();
-      }, 800);
+      }, 500);
     });
 
     window.handleLogout = () => {
@@ -784,21 +1027,23 @@
         updateRoleUI();
         showToast("Anda telah keluar dari akun.", "info");
         hideLoader();
-      }, 500);
+      }, 400);
     };
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         const target = btn.getAttribute('data-target');
+        
         document.querySelectorAll('.view-section').forEach(el => el.classList.add('hide'));
         document.getElementById(target).classList.remove('hide');
+
         document.querySelectorAll('.nav-btn').forEach(b => {
-          b.classList.remove('bg-blue-600', 'text-white', 'shadow-md', 'shadow-blue-900/20');
-          b.classList.add('hover:bg-slate-800', 'hover:text-white');
+          b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+          b.classList.add('btn-theme-alt');
         });
-        btn.classList.add('bg-blue-600', 'text-white', 'shadow-md', 'shadow-blue-900/20');
-        btn.classList.remove('hover:bg-slate-800', 'hover:text-white');
+        btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+        btn.classList.remove('btn-theme-alt');
       });
     });
 
@@ -879,34 +1124,34 @@
       let top4 = combined.slice(0, 4);
 
       if(top4.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada aktivitas.</p>`;
+        container.innerHTML = `<p class="text-xs opacity-70 text-center py-4">Belum ada aktivitas.</p>`;
         return;
       }
       container.innerHTML = top4.map(act => {
         if(act.type === 'kas') {
           let isM = act.data.tipe === 'masuk';
           return `
-            <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
-              <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isM ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}">
+            <div class="flex items-center gap-3 p-3 rounded-2xl panel-light-theme">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isM ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400'}">
                 <i class="fas ${isM ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
               </div>
               <div class="flex-1 overflow-hidden">
-                <p class="text-xs font-bold text-slate-800 truncate">${act.data.keterangan}</p>
-                <p class="text-[10px] text-slate-500 font-medium">${formatTgl(act.ts)}</p>
+                <p class="text-xs font-bold truncate">${act.data.keterangan}</p>
+                <p class="text-[10px] opacity-70 font-medium">${formatTgl(act.ts)}</p>
               </div>
-              <span class="font-extrabold text-sm ${isM ? 'text-emerald-600' : 'text-rose-600'}">${isM?'+':'-'}${formatRp(act.data.nominal)}</span>
+              <span class="font-extrabold text-sm ${isM ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${isM?'+':'-'}${formatRp(act.data.nominal)}</span>
             </div>`;
         } else {
           return `
-            <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
-              <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <div class="flex items-center gap-3 p-3 rounded-2xl panel-light-theme">
+              <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <i class="fas fa-calendar-check"></i>
               </div>
               <div class="flex-1 overflow-hidden">
-                <p class="text-xs font-bold text-slate-800 truncate">Pertemuan: ${act.data.materi}</p>
-                <p class="text-[10px] text-slate-500 font-medium">Latihan ${act.data.tanggal}</p>
+                <p class="text-xs font-bold truncate">Pertemuan: ${act.data.materi}</p>
+                <p class="text-[10px] opacity-70 font-medium">Latihan ${act.data.tanggal}</p>
               </div>
-              <span class="font-bold text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-lg">Presensi</span>
+              <span class="font-bold text-xs text-blue-600 dark:text-blue-300 bg-blue-500/20 px-2.5 py-1 rounded-lg">Presensi</span>
             </div>`;
         }
       }).join('');
@@ -1030,15 +1275,15 @@
       let sorted = sortAnggotaList([...dataStore.anggota]);
       let filtered = sorted.filter(m => m.nama.toLowerCase().includes(searchVal) || m.kelas.toLowerCase().includes(searchVal));
 
-      if (filtered.length === 0) return container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada siswa.</p>`;
+      if (filtered.length === 0) return container.innerHTML = `<p class="text-xs opacity-70 text-center py-4">Belum ada siswa.</p>`;
       
       container.innerHTML = filtered.map(m => {
         let st = window.tempAttendanceState[m.id] || 'hadir';
         return `
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-xl bg-white border border-slate-200 gap-2 shadow-sm">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-xl panel-light-theme gap-2">
             <div>
-              <span class="text-xs font-bold text-slate-800 block">${m.nama}</span>
-              <span class="text-[10px] text-slate-500 font-semibold">${m.kelas}</span>
+              <span class="text-xs font-bold block">${m.nama}</span>
+              <span class="text-[10px] opacity-70 font-semibold">${m.kelas}</span>
             </div>
             <div class="flex items-center gap-1.5 self-end sm:self-auto">
               ${['hadir','izin','sakit','alpa'].map(type => {
@@ -1046,7 +1291,7 @@
                 let label = type.charAt(0).toUpperCase() + type.slice(1);
                 let isChecked = st === type;
                 return `
-                <label class="cursor-pointer px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-${cl}-200 bg-${cl}-50 text-${cl}-700 flex items-center gap-1 transition-all ${isChecked?'ring-2 ring-'+cl+'-400':''}">
+                <label class="cursor-pointer px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-${cl}-500/30 bg-${cl}-500/10 text-${cl}-600 dark:text-${cl}-300 flex items-center gap-1 ${isChecked?'ring-2 ring-'+cl+'-400 bg-'+cl+'-500/20':''}">
                   <input type="radio" name="st_${m.id}" value="${type}" ${isChecked?'checked':''} onchange="updateTempStatus('${m.id}', '${type}'); renderModalPresensiStudents()" class="hidden"> ${label}
                 </label>`;
               }).join('')}
@@ -1095,7 +1340,7 @@
       if (type === 'anggota') {
         let src = (document.getElementById('searchAnggotaInput')?.value || "").toLowerCase();
         let flt = sortAnggotaList([...dataStore.anggota]).filter(m => m.nama.toLowerCase().includes(src) || m.kelas.toLowerCase().includes(src));
-        if (flt.length === 0) return tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 text-xs">Belum ada siswa.</td></tr>`;
+        if (flt.length === 0) return tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center opacity-70 text-xs">Belum ada siswa.</td></tr>`;
         
         flt.forEach(m => {
           let h=0,i=0,s=0,a=0;
@@ -1103,50 +1348,50 @@
             let f = (p.pesertaList||[]).find(x=>x.id===m.id);
             if(f){ f.status==='hadir'?h++ : f.status==='izin'?i++ : f.status==='sakit'?s++ : a++; }
           });
-          let act = currentRole === 'pengurus' ? `<div class="flex justify-center gap-2"><button onclick="editAnggota('${m.id}')" class="text-blue-500 hover:text-blue-700 p-1 bg-blue-50 rounded"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteRow('anggota','${m.id}')" class="text-rose-500 hover:text-rose-700 p-1 bg-rose-50 rounded"><i class="fas fa-trash text-xs"></i></button></div>` : '';
-          html += `<tr class="hover:bg-blue-50/30 transition-colors">
-            <td class="p-4 border-b border-slate-100 font-bold text-slate-800">${m.nama}</td>
-            <td class="p-4 border-b border-slate-100"><span class="px-2.5 py-1 bg-slate-100 text-slate-600 font-bold rounded-md text-[10px]">${m.kelas}</span></td>
-            <td class="p-4 border-b border-slate-100 text-center font-extrabold text-emerald-600">${h}</td>
-            <td class="p-4 border-b border-slate-100 text-center font-extrabold text-blue-600">${i}</td>
-            <td class="p-4 border-b border-slate-100 text-center font-extrabold text-amber-600">${s}</td>
-            <td class="p-4 border-b border-slate-100 text-center font-extrabold text-rose-600">${a}</td>
-            ${currentRole === 'pengurus' ? `<td class="p-4 border-b border-slate-100 text-center">${act}</td>` : ''}
+          let act = currentRole === 'pengurus' ? `<div class="flex justify-center gap-2"><button onclick="editAnggota('${m.id}')" class="text-blue-600 dark:text-blue-400 p-1.5 btn-theme-alt rounded-lg"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteRow('anggota','${m.id}')" class="text-rose-600 dark:text-rose-400 p-1.5 btn-theme-alt rounded-lg"><i class="fas fa-trash text-xs"></i></button></div>` : '';
+          html += `<tr>
+            <td class="p-4 font-bold">${m.nama}</td>
+            <td class="p-4"><span class="px-2.5 py-1 panel-light-theme font-bold rounded-md text-[10px] border border-inherit">${m.kelas}</span></td>
+            <td class="p-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">${h}</td>
+            <td class="p-4 text-center font-extrabold text-blue-600 dark:text-blue-400">${i}</td>
+            <td class="p-4 text-center font-extrabold text-amber-600 dark:text-amber-400">${s}</td>
+            <td class="p-4 text-center font-extrabold text-rose-600 dark:text-rose-400">${a}</td>
+            ${currentRole === 'pengurus' ? `<td class="p-4 text-center">${act}</td>` : ''}
           </tr>`;
         });
         return tbody.innerHTML = html;
       }
 
       let data = dataStore[type];
-      if (data.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 text-xs">Belum ada data.</td></tr>`;
+      if (data.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center opacity-70 text-xs">Belum ada data.</td></tr>`;
 
       data.forEach(item => {
-        let act = currentRole === 'pengurus' ? `<div class="flex justify-center gap-2"><button onclick="${type==='kas'?`editKas('${item.id}')`:`openPresensiModal('${item.id}')`}" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteRow('${type}','${item.id}')" class="text-rose-500 hover:bg-rose-50 p-1.5 rounded"><i class="fas fa-trash text-xs"></i></button></div>` : '';
+        let act = currentRole === 'pengurus' ? `<div class="flex justify-center gap-2"><button onclick="${type==='kas'?`editKas('${item.id}')`:`openPresensiModal('${item.id}')`}" class="text-blue-600 dark:text-blue-400 p-1.5 btn-theme-alt rounded-lg"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteRow('${type}','${item.id}')" class="text-rose-600 dark:text-rose-400 p-1.5 btn-theme-alt rounded-lg"><i class="fas fa-trash text-xs"></i></button></div>` : '';
         if (type === 'kas') {
           let isM = item.tipe === 'masuk';
-          html += `<tr class="hover:bg-slate-50 transition-colors">
-            <td class="p-4 border-b border-slate-100 font-medium text-slate-500 text-xs whitespace-nowrap">${formatTgl(item.timestamp?.toMillis())}</td>
-            <td class="p-4 border-b border-slate-100 font-bold text-slate-800">${item.keterangan}</td>
-            <td class="p-4 border-b border-slate-100 text-right font-extrabold whitespace-nowrap ${isM?'text-emerald-600':'text-rose-600'}">${isM?'+':'-'} ${formatRp(item.nominal)}</td>
-            ${currentRole === 'pengurus' ? `<td class="p-4 border-b border-slate-100">${act}</td>` : ''}
+          html += `<tr>
+            <td class="p-4 font-medium opacity-70 text-xs whitespace-nowrap">${formatTgl(item.timestamp?.toMillis())}</td>
+            <td class="p-4 font-bold">${item.keterangan}</td>
+            <td class="p-4 text-right font-extrabold whitespace-nowrap ${isM?'text-emerald-600 dark:text-emerald-400':'text-rose-600 dark:text-rose-400'}">${isM?'+':'-'} ${formatRp(item.nominal)}</td>
+            ${currentRole === 'pengurus' ? `<td class="p-4">${act}</td>` : ''}
           </tr>`;
         } else if (type === 'presensi') {
-          let fb = item.fileData ? `<button onclick="previewFile('${item.id}')" class="px-3 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-[10px] font-bold inline-flex items-center gap-1"><i class="fas fa-paperclip"></i> Lihat</button>` : `<span class="text-slate-300">-</span>`;
+          let fb = item.fileData ? `<button onclick="previewFile('${item.id}')" class="px-3 py-1 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 rounded-lg text-[10px] font-bold inline-flex items-center gap-1"><i class="fas fa-paperclip"></i> Lihat</button>` : `<span class="opacity-40">-</span>`;
           let h=0,i=0,s=0,a=0;
           if(item.pesertaList) item.pesertaList.forEach(p => { p.status==='hadir'?h++ : p.status==='izin'?i++ : p.status==='sakit'?s++ : a++; });
-          html += `<tr class="hover:bg-slate-50 transition-colors">
-            <td class="p-4 border-b border-slate-100 font-medium text-slate-500 text-xs whitespace-nowrap">${item.tanggal}</td>
-            <td class="p-4 border-b border-slate-100 font-bold text-slate-800">${item.materi}</td>
-            <td class="p-4 border-b border-slate-100 text-center whitespace-nowrap">
-              <span class="px-3 py-1.5 bg-slate-100 font-bold text-[10px] rounded-lg tracking-wider text-slate-600 shadow-sm border border-slate-200">
-                <span class="text-emerald-600">${h}H</span> / <span class="text-blue-600">${i}I</span> / <span class="text-amber-600">${s}S</span> / <span class="text-rose-600">${a}A</span>
+          html += `<tr>
+            <td class="p-4 font-medium opacity-70 text-xs whitespace-nowrap">${item.tanggal}</td>
+            <td class="p-4 font-bold">${item.materi}</td>
+            <td class="p-4 text-center whitespace-nowrap">
+              <span class="px-3 py-1.5 panel-light-theme border border-inherit font-bold text-[10px] rounded-lg tracking-wider">
+                <span class="text-emerald-600 dark:text-emerald-400">${h}H</span> / <span class="text-blue-600 dark:text-blue-400">${i}I</span> / <span class="text-amber-600 dark:text-amber-400">${s}S</span> / <span class="text-rose-600 dark:text-rose-400">${a}A</span>
               </span>
             </td>
-            <td class="p-4 border-b border-slate-100 text-center whitespace-nowrap">${fb}</td>
-            <td class="p-4 border-b border-slate-100 text-center whitespace-nowrap">
-              <button onclick="viewPresensiDetail('${item.id}')" class="px-3 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-[10px] font-bold shadow-sm">Detail</button>
+            <td class="p-4 text-center whitespace-nowrap">${fb}</td>
+            <td class="p-4 text-center whitespace-nowrap">
+              <button onclick="viewPresensiDetail('${item.id}')" class="px-3 py-1 btn-theme-alt rounded-lg text-[10px] font-bold">Detail</button>
             </td>
-            ${currentRole === 'pengurus' ? `<td class="p-4 border-b border-slate-100">${act}</td>` : ''}
+            ${currentRole === 'pengurus' ? `<td class="p-4">${act}</td>` : ''}
           </tr>`;
         }
       });
@@ -1158,18 +1403,18 @@
       if(!tbody) return;
       let src = (document.getElementById('searchNilaiInput')?.value || "").toLowerCase();
       let flt = sortAnggotaList([...dataStore.anggota]).filter(m => m.nama.toLowerCase().includes(src) || m.kelas.toLowerCase().includes(src));
-      if(flt.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Tidak ada siswa.</td></tr>`;
+      if(flt.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center opacity-70">Tidak ada siswa.</td></tr>`;
       
       let html = '';
       flt.forEach((m, idx) => {
         let ex = dataStore.nilai.find(n => n.memberId === m.id) || {};
-        let act = currentRole === 'pembina' ? `<button type="button" onclick="saveSingleNilai('${m.id}')" class="w-8 h-8 flex items-center justify-center bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold rounded-xl transition-colors mx-auto" title="Simpan"><i class="fas fa-check"></i></button>` : '';
-        html += `<tr class="hover:bg-amber-50/20 transition-colors">
-          <td class="p-4 text-center font-bold text-slate-400 text-xs">${idx + 1}</td>
-          <td class="p-4 font-bold text-slate-800">${m.nama}</td>
-          <td class="p-4"><span class="px-2.5 py-1 bg-slate-100 text-slate-600 font-bold rounded-md text-[10px]">${m.kelas}</span></td>
-          <td class="p-4 text-center"><input type="text" id="nilai_in_${m.id}" value="${ex.nilai||''}" placeholder="Cth: A" class="w-16 px-2 py-2 border border-slate-300 rounded-xl text-center font-extrabold text-amber-600 text-sm outline-none focus:ring-2 focus:ring-amber-500 bg-white shadow-inner mx-auto"></td>
-          <td class="p-4"><input type="text" id="ket_in_${m.id}" value="${ex.keterangan||''}" placeholder="Catatan evaluasi..." class="w-full min-w-[150px] px-3 py-2 border border-slate-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-amber-500 bg-white shadow-inner"></td>
+        let act = currentRole === 'pembina' ? `<button type="button" onclick="saveSingleNilai('${m.id}')" class="w-8 h-8 flex items-center justify-center bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold rounded-xl mx-auto" title="Simpan"><i class="fas fa-check"></i></button>` : '';
+        html += `<tr>
+          <td class="p-4 text-center font-bold opacity-60 text-xs">${idx + 1}</td>
+          <td class="p-4 font-bold">${m.nama}</td>
+          <td class="p-4"><span class="px-2.5 py-1 panel-light-theme font-bold rounded-md text-[10px] border border-inherit">${m.kelas}</span></td>
+          <td class="p-4 text-center"><input type="text" id="nilai_in_${m.id}" value="${ex.nilai||''}" placeholder="Cth: A" class="w-16 px-2 py-2 input-theme rounded-xl text-center font-extrabold text-amber-600 dark:text-amber-400 text-sm outline-none mx-auto"></td>
+          <td class="p-4"><input type="text" id="ket_in_${m.id}" value="${ex.keterangan||''}" placeholder="Catatan evaluasi..." class="w-full min-w-[150px] px-3 py-2 input-theme rounded-xl text-xs font-medium outline-none"></td>
           ${currentRole === 'pembina' ? `<td class="p-4 text-center">${act}</td>` : ''}
         </tr>`;
       });
@@ -1220,16 +1465,16 @@
       c.innerHTML = (p.pesertaList && p.pesertaList.length > 0) ? p.pesertaList.map(i => {
         let cls = {hadir:'emerald', izin:'blue', sakit:'amber', alpa:'rose'}[i.status];
         return `
-          <div class="flex justify-between items-center p-3 rounded-xl bg-white border border-slate-200 mb-2 shadow-sm">
+          <div class="flex justify-between items-center p-3 rounded-xl panel-theme mb-2 border border-inherit">
             <div>
-              <span class="text-xs font-bold text-slate-800 block">${i.nama}</span>
-              <span class="text-[10px] text-slate-500 font-semibold">${i.kelas}</span>
+              <span class="text-xs font-bold block">${i.nama}</span>
+              <span class="text-[10px] opacity-70 font-semibold">${i.kelas}</span>
             </div>
-            <div class="px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase border border-${cls}-200 bg-${cls}-50 text-${cls}-700">
+            <div class="px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase border border-${cls}-500/30 bg-${cls}-500/10 text-${cls}-600 dark:text-${cls}-300">
               ${i.status}
             </div>
           </div>`;
-      }).join('') : `<p class="text-xs text-slate-400 text-center py-4">Kosong.</p>`;
+      }).join('') : `<p class="text-xs opacity-70 text-center py-4">Kosong.</p>`;
       document.getElementById('detailPresensiModal').classList.remove('hide');
     };
 
@@ -1238,7 +1483,7 @@
       if (!p || !p.fileData) return;
       document.getElementById('previewFileContainer').innerHTML = p.fileData.startsWith('data:image') 
         ? `<img src="${p.fileData}" alt="Bukti" class="max-h-[70vh] rounded-2xl object-contain">`
-        : `<div class="text-center p-6 space-y-3 bg-white rounded-3xl"><i class="fas fa-file-pdf text-rose-500 text-6xl"></i><p class="text-xs font-bold text-slate-700 max-w-[200px] truncate">${p.fileName || 'Dokumen'}</p><a href="${p.fileData}" download="${p.fileName}" class="inline-block px-5 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow">Unduh File</a></div>`;
+        : `<div class="text-center p-6 space-y-3 panel-theme rounded-3xl"><i class="fas fa-file-pdf text-rose-500 text-6xl"></i><p class="text-xs font-bold max-w-[200px] truncate">${p.fileName || 'Dokumen'}</p><a href="${p.fileData}" download="${p.fileName}" class="inline-block px-5 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow">Unduh File</a></div>`;
       document.getElementById('previewFileModal').classList.remove('hide');
     };
 
@@ -1357,13 +1602,118 @@
       downloadExcel(d, `Presensi_${p.tanggal}.xlsx`, "DAFTAR HADIR", `Materi: ${p.materi}`);
     };
 
+    // --- GEMINI CHAT CONTROLLER ---
+    window.sendQuickPrompt = (promptText) => {
+      document.getElementById('chatInput').value = promptText;
+      document.getElementById('chatForm').requestSubmit();
+    };
+
+    window.clearChatHistory = () => {
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/30">
+            <i class="fas fa-robot text-xs"></i>
+          </div>
+          <div class="panel-light-theme p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed border border-inherit shadow-sm">
+            Riwayat dibersihkan. Ada hal lain yang ingin didiskusikan mengenai Fourteen Badminton Club?
+          </div>
+        </div>`;
+      initGeminiChat();
+      showToast("Riwayat chat dibersihkan", "info");
+    };
+
+    window.handleChatSubmit = async (e) => {
+      e.preventDefault();
+      const inputEl = document.getElementById('chatInput');
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      const chatContainer = document.getElementById('chatMessages');
+      
+      // Append User Bubble
+      chatContainer.innerHTML += `
+        <div class="flex items-start gap-3 justify-end">
+          <div class="bg-blue-600 text-white p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed shadow-sm">
+            ${escapeHtml(text)}
+          </div>
+          <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0 border border-blue-500/30">
+            <i class="fas fa-user text-xs"></i>
+          </div>
+        </div>`;
+      inputEl.value = "";
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      // Append Loading Typing Indicator
+      const loadingId = 'loading_' + Date.now();
+      chatContainer.innerHTML += `
+        <div id="${loadingId}" class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/30">
+            <i class="fas fa-robot text-xs"></i>
+          </div>
+          <div class="panel-light-theme p-4 rounded-2xl text-xs sm:text-sm flex items-center gap-2 border border-inherit">
+            <i class="fas fa-circle-notch fa-spin text-purple-400"></i>
+            <span class="opacity-70">Gemini sedang mengetik...</span>
+          </div>
+        </div>`;
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      try {
+        if (!chatSessionInstance) {
+          initGeminiChat();
+        }
+
+        // Susun konteks data portal agar AI mengetahui kondisi klub saat ini
+        let tMasuk = 0, tKeluar = 0;
+        dataStore.kas.forEach(k => { let n = Number(k.nominal) || 0; k.tipe === 'masuk' ? tMasuk += n : tKeluar += n; });
+        
+        let contextSummary = `[KONTEKS DATA FBC TERKINI]\n- Total Anggota: ${dataStore.anggota.length} orang\n- Total Sesi Presensi: ${dataStore.presensi.length} sesi\n- Saldo Kas Bersih: Rp ${tMasuk - tKeluar} (Pemasukan: Rp ${tMasuk}, Pengeluaran: Rp ${tKeluar})\n- Pengumuman Aktif: ${dataStore.board.title} - ${dataStore.board.content}\n\nPertanyaan User: ${text}`;
+
+        const response = await chatSessionInstance.sendMessage({ message: contextSummary });
+        const aiReply = response.text || "Maaf, saya tidak dapat menghasilkan respon saat ini.";
+
+        // Hapus indikator loading
+        document.getElementById(loadingId)?.remove();
+
+        // Append AI Bubble
+        chatContainer.innerHTML += `
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/30">
+              <i class="fas fa-robot text-xs"></i>
+            </div>
+            <div class="panel-light-theme p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed border border-inherit shadow-sm whitespace-pre-wrap">
+              ${escapeHtml(aiReply)}
+            </div>
+          </div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      } catch (err) {
+        console.error("Gemini Error:", err);
+        document.getElementById(loadingId)?.remove();
+        chatContainer.innerHTML += `
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+              <i class="fas fa-triangle-exclamation text-xs"></i>
+            </div>
+            <div class="panel-light-theme p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm text-rose-500 border border-inherit">
+              Terjadi kesalahan saat menghubungi Gemini AI. Silakan coba beberapa saat lagi.
+            </div>
+          </div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    };
+
+    function escapeHtml(string) {
+      return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function showToast(msg, type="success") {
       const t = document.getElementById('toastNotif'), i = document.getElementById('toastIcon');
       document.getElementById('toastMsg').innerText = msg;
-      t.className = `toast px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 text-white ${type==='error'?'bg-rose-600':type==='info'?'bg-blue-600':'bg-slate-800'}`;
-      i.className = type==='error'?'fas fa-triangle-exclamation text-white':type==='info'?'fas fa-circle-info text-white':'fas fa-circle-check text-emerald-400';
+      t.className = `toast panel-theme px-5 py-4 rounded-2xl shadow-xl flex items-center gap-3 border ${type==='error'?'border-rose-500/50':type==='info'?'border-blue-500/50':'border-emerald-500/50'}`;
+      i.className = type==='error'?'fas fa-triangle-exclamation text-rose-500':type==='info'?'fas fa-circle-info text-blue-500':'fas fa-circle-check text-emerald-500';
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3500);
+      setTimeout(() => t.classList.remove('show'), 3000);
     }
     updateRoleUI();
   </script>
