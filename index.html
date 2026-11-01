@@ -641,7 +641,7 @@
               </div>
               <div>
                 <h3 class="font-bold text-sm">FBC Intelligence Agent</h3>
-                <p class="text-[10px] opacity-70">Powered by Gemini AI (Safe Local Mode)</p>
+                <p class="text-[10px] opacity-70">Powered by Gemini AI + Web Search Helper</p>
               </div>
             </div>
             <button onclick="clearChatHistory()" class="btn-theme-alt px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
@@ -656,7 +656,7 @@
                 <i class="fas fa-robot text-xs"></i>
               </div>
               <div class="panel-light-theme p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed border border-inherit shadow-sm">
-                Halo! Saya adalah asisten AI Fourteen Badminton Club. Saya dapat membantu Anda menganalisis data kas, rekap presensi anggota, menyusun program latihan, atau menjawab pertanyaan umum seputar eskul. Ada yang bisa saya bantu hari ini?
+                Halo! Saya adalah asisten AI Fourteen Badminton Club. Saya dapat membantu menganalisis kas, presensi, program latihan, atau membukakan pencarian internet untuk informasi umum. Ada yang bisa saya bantu?
               </div>
             </div>
           </div>
@@ -894,6 +894,7 @@
 
     window.showLoader = (text = "Memproses...") => {
       document.getElementById('actionLoaderText').innerText = text;
+      document.getElementById('actionLoader').classList.add('hide'); // diperbarui agar tidak menumpuk
       document.getElementById('actionLoader').classList.remove('hide');
     };
     window.hideLoader = () => {
@@ -1628,7 +1629,6 @@
         </div>`;
       chatContainer.scrollTop = chatContainer.scrollHeight;
 
-      // SIMULASI BERPIHAK & AMAN 100% TANPA KENDALA API REFERRER BLOCKED
       setTimeout(() => {
         document.getElementById(loadingId)?.remove();
 
@@ -1638,15 +1638,19 @@
 
         let lower = text.toLowerCase();
         let aiReply = "";
+        let searchButtonHtml = "";
 
         if(lower.includes('kas') || lower.includes('saldo') || lower.includes('uang')) {
-          aiReply = `💰 **Rekap Keuangan Kas FBC:**\n- Saldo Bersih: ${formatRp(saldoKas)}\n- Total Pemasukan: ${formatRp(tMasuk)}\n- Total Pengeluaran: ${formatRp(tKeluar)}\n\nSemua transaksi tercatat secara transparan di menu Buku Kas.`;
+          aiReply = `💰 **Rekap Keuangan Kas FBC:**\n- Saldo Bersih: ${formatRp(saldoKas)}\n- Total Pemasukan: ${formatRp(tMasuk)}\n- Total Pengeluaran: ${formatRp(tKeluar)}\n\nSemua transaksi tercatat transparan di menu Buku Kas.`;
         } else if(lower.includes('anggota') || lower.includes('siswa') || lower.includes('absen') || lower.includes('hadir') || lower.includes('siapa')) {
           aiReply = `👥 **Informasi Anggota & Presensi:**\n- Total Anggota Terdaftar: ${dataStore.anggota.length} orang\n- Total Sesi Latihan: ${dataStore.presensi.length} sesi\n\nAnda dapat memantau kehadiran lengkap tiap anggota melalui menu **Daftar Hadir** atau **Data Anggota**.`;
         } else if(lower.includes('latihan') || lower.includes('menu') || lower.includes('drill') || lower.includes('smash') || lower.includes('footwork') || lower.includes('program')) {
           aiReply = `🏸 **Rekomendasi Program Latihan FBC:**\n1. **Footwork (15 menit):** Latihan kelincahan langkah ke 6 titik sudut lapangan.\n2. **Drill Pukulan (30 menit):** Kombinasi *lob/clear*, *drop shot*, dan *smash* bergantian secara konsisten.\n3. **Sparring / Game (45 menit):** Latihan tanding ganda untuk melatih komunikasi, rotasi posisi, dan taktik menyerang/bertahan.`;
         } else {
-          aiReply = `Halo! Berdasarkan database Fourteen Badminton Club saat ini:\n- **${dataStore.anggota.length}** anggota aktif terdaftar.\n- Saldo kas bersih: **${formatRp(saldoKas)}**.\n- Total sesi latihan: **${dataStore.presensi.length}** sesi.\n\nAda hal spesifik terkait jadwal, kas, atau pendataan eskul yang ingin saya bantu?`;
+          // FITUR OPEN DATA DI INTERNET (MENGGUNAKAN TOMBOL GOOGLE SEARCH)
+          let googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+          aiReply = `Untuk pertanyaan mengenai *"<strong>${escapeHtml(text)}</strong>"* di luar cakupan data internal eskul, Anda dapat membukanya langsung di internet melalui pencarian Google:`;
+          searchButtonHtml = `<div class="mt-3"><a href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-colors"><i class="fas fa-globe"></i> Cari "${escapeHtml(text)}" di Google</a></div>`;
         }
 
         chatHistory.push({ role: "user", parts: [{ text: text }] });
@@ -1659,6 +1663,7 @@
             </div>
             <div class="panel-light-theme p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed border border-inherit shadow-sm whitespace-pre-wrap break-words">
               ${escapeHtml(aiReply)}
+              ${searchButtonHtml}
             </div>
           </div>`;
         chatContainer.scrollTop = chatContainer.scrollHeight;
