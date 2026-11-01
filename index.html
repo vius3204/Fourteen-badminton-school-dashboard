@@ -16,7 +16,6 @@
       transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* --- THEME VARIABELS (TERANG & GELAP) --- */
     body.theme-dark {
       background: #090d16;
       color: #f1f5f9;
@@ -28,12 +27,10 @@
 
     .hide { display: none !important; }
     
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.02); }
     ::-webkit-scrollbar-thumb { background: rgba(100, 100, 100, 0.2); border-radius: 10px; }
     
-    /* Panels */
     body.theme-dark .panel-theme {
       background: #111827;
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -120,7 +117,6 @@
     }
     body.theme-light .btn-theme-alt:hover { background: #cbd5e1; }
 
-    /* Styling Khusus Banner Publik agar Kontras di Kedua Tema */
     body.theme-light #publicBanner {
       background-color: #fef3c7;
       border-color: #fcd34d;
@@ -246,7 +242,6 @@
     </div>
     
     <div class="p-4 border-t border-inherit shrink-0 space-y-3">
-      <!-- Tombol Ganti Tema Manual -->
       <button type="button" onclick="toggleThemeManual()" class="w-full btn-theme-alt font-bold py-2.5 px-3 rounded-xl transition-colors text-xs flex items-center justify-center gap-2 shadow-sm">
         <i id="themeIconBtn" class="fas fa-moon text-blue-400"></i> <span id="themeTextBtn">Mode Gelap / Terang</span>
       </button>
@@ -290,7 +285,7 @@
       </button>
     </div>
 
-    <!-- Banner Publik dengan Warna Kontras Aman untuk Mode Terang & Gelap -->
+    <!-- Banner Publik -->
     <div id="publicBanner" class="border-b px-4 md:px-6 py-2.5 text-xs md:text-sm font-medium flex items-center justify-between shrink-0 transition-colors">
       <div class="flex items-center gap-2 overflow-hidden">
         <i class="fas fa-circle-info text-amber-500 text-base shrink-0"></i>
@@ -303,15 +298,14 @@
       
       <!-- OVERVIEW -->
       <div id="view-overview" class="view-section space-y-6">
-        
         <div class="panel-theme rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl relative overflow-hidden flex flex-col gap-6">
           <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 z-10">
             <div class="space-y-2">
               <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-600 dark:text-blue-200 text-xs font-semibold">
                 <span class="w-2 h-2 rounded-full bg-blue-400"></span> Portal Informasi Eskul
               </div>
-              <h1 class="text-xl sm:text-2xl md:text-4xl font-extrabold tracking-tight flex items-center gap-3">
-                <i class="fas fa-bullhorn text-amber-500 shrink-0"></i> <span id="boardTitleDisplay" class="truncate">Jadwal & Pengumuman</span>
+              <h1 class="text-xl sm:text-2xl md:text-4xl font-extrabold tracking-tight flex items-center gap-3 flex-wrap">
+                <i class="fas fa-bullhorn text-amber-500 shrink-0"></i> <span id="boardTitleDisplay" class="break-words">Jadwal & Pengumuman</span>
               </h1>
             </div>
             <div class="hidden sm:flex items-center justify-center w-16 h-16 panel-light-theme rounded-2xl shrink-0 p-1 border border-inherit">
@@ -647,7 +641,7 @@
               </div>
               <div>
                 <h3 class="font-bold text-sm">FBC Intelligence Agent</h3>
-                <p class="text-[10px] opacity-70">Powered by Gemini 2.5 Flash</p>
+                <p class="text-[10px] opacity-70">Powered by Gemini 3.8 Flash</p>
               </div>
             </div>
             <button onclick="clearChatHistory()" class="btn-theme-alt px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
@@ -835,7 +829,6 @@
     import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { GoogleGenAI } from "https://esm.run/@google/genai";
 
-    // --- INISIALISASI TEMA BERDASARKAN WAKTU PERANGKAT ---
     function initAutoTheme() {
       const currentHour = new Date().getHours();
       const isDayTime = currentHour >= 6 && currentHour < 18;
@@ -898,7 +891,6 @@
     const paths = { kas: 'kas', presensi: 'presensi', anggota: 'anggota', nilai: 'nilai', board: 'board' };
     let dataStore = { kas: [], presensi: [], anggota: [], nilai: [], board: { title: "Jadwal & Pengumuman", content: "Memuat informasi..." } };
 
-    // --- INISIALISASI GEMINI SDK ---
     const ai = new GoogleGenAI({ apiKey: "AIzaSyBkcmiXH_VdY4ARHb4hSb8_7Itn3TbHemY" });
     let chatSessionInstance = null;
 
@@ -937,7 +929,7 @@
         const systemInstruction = `Anda adalah FBC Assistant, AI pintar untuk Fourteen Badminton Club (FBC), sebuah ekstrakurikuler bulu tangkis di SMAN 14 Surabaya. Tugas Anda adalah membantu pengurus, pembina, maupun anggota dalam menganalisis data keuangan kas, rekap presensi kehadiran latihan, memberikan program latihan bulu tangkis yang efektif (seperti drill, footwork, smash, taktik ganda/tunggal), serta menjawab pertanyaan seputar manajemen eskul. Jawablah dengan ramah, profesional, menggunakan bahasa Indonesia yang baik, dan manfaatkan data real-time klub yang tersedia pada konteks sistem bila diperlukan.`;
         
         chatSessionInstance = ai.chats.create({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3.8-flash',
           config: {
             systemInstruction: systemInstruction,
             temperature: 0.7,
@@ -1602,7 +1594,6 @@
       downloadExcel(d, `Presensi_${p.tanggal}.xlsx`, "DAFTAR HADIR", `Materi: ${p.materi}`);
     };
 
-    // --- GEMINI CHAT CONTROLLER ---
     window.sendQuickPrompt = (promptText) => {
       document.getElementById('chatInput').value = promptText;
       document.getElementById('chatForm').requestSubmit();
@@ -1631,10 +1622,9 @@
 
       const chatContainer = document.getElementById('chatMessages');
       
-      // Append User Bubble
       chatContainer.innerHTML += `
         <div class="flex items-start gap-3 justify-end">
-          <div class="bg-blue-600 text-white p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed shadow-sm">
+          <div class="bg-blue-600 text-white p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed shadow-sm break-words">
             ${escapeHtml(text)}
           </div>
           <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0 border border-blue-500/30">
@@ -1644,7 +1634,6 @@
       inputEl.value = "";
       chatContainer.scrollTop = chatContainer.scrollHeight;
 
-      // Append Loading Typing Indicator
       const loadingId = 'loading_' + Date.now();
       chatContainer.innerHTML += `
         <div id="${loadingId}" class="flex items-start gap-3">
@@ -1663,7 +1652,6 @@
           initGeminiChat();
         }
 
-        // Susun konteks data portal agar AI mengetahui kondisi klub saat ini
         let tMasuk = 0, tKeluar = 0;
         dataStore.kas.forEach(k => { let n = Number(k.nominal) || 0; k.tipe === 'masuk' ? tMasuk += n : tKeluar += n; });
         
@@ -1672,16 +1660,14 @@
         const response = await chatSessionInstance.sendMessage({ message: contextSummary });
         const aiReply = response.text || "Maaf, saya tidak dapat menghasilkan respon saat ini.";
 
-        // Hapus indikator loading
         document.getElementById(loadingId)?.remove();
 
-        // Append AI Bubble
         chatContainer.innerHTML += `
           <div class="flex items-start gap-3">
             <div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/30">
               <i class="fas fa-robot text-xs"></i>
             </div>
-            <div class="panel-light-theme p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed border border-inherit shadow-sm whitespace-pre-wrap">
+            <div class="panel-light-theme p-4 rounded-2xl max-w-[85%] text-xs sm:text-sm leading-relaxed border border-inherit shadow-sm whitespace-pre-wrap break-words">
               ${escapeHtml(aiReply)}
             </div>
           </div>`;
@@ -1704,7 +1690,14 @@
     };
 
     function escapeHtml(string) {
-      return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      let cleanStr = String(string)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      return cleanStr;
     }
 
     function showToast(msg, type="success") {
