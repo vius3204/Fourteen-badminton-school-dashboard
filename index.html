@@ -25,12 +25,12 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300 font-sans">
 
-    <!-- 1. LOADER WAJIB DI SINI: Tepat setelah <body> dibuka -->
+    <!-- 1. GLOBAL LOADER: Posisi absolute penuh agar tidak tersangkut di header -->
     <div id="global-loader" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; display: flex; align-items: center; justify-content: center;" class="bg-white dark:bg-gray-900 transition-opacity duration-300">
         <div class="loader ease-linear rounded-full border-4 border-gray-200 h-12 w-12"></div>
     </div>
 
-    <!-- 2. KONTEN WEB LAINNYA DI BAWAH LOADER -->
+    <!-- 2. KONTEN UTAMA WEB -->
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
@@ -51,32 +51,35 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Area Konten Sebelah Kanan -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Topbar -->
+            
+            <!-- Topbar / Header -->
             <header class="h-20 bg-white dark:bg-gray-800 shadow-sm flex items-center justify-between px-6 z-30 relative">
+                <!-- Tombol Menu Mobile -->
                 <button id="sidebar-toggle" class="md:hidden text-gray-600 dark:text-gray-300 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 
                 <div class="flex items-center space-x-4 ml-auto">
-                    <!-- Dark Mode Toggle -->
+                    <!-- Toggle Dark Mode -->
                     <button id="theme-toggle" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition focus:outline-none">
                         <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                     </button>
+                    <!-- Profil Pengguna -->
                     <div class="flex items-center">
-                        <img src="https://ui-avatars.com/api/?name=Vincentius+Calvin&background=1f2937&color=fff" alt="Profile" class="w-8 h-8 rounded-full">
+                        <img src="https://ui-avatars.com/api/?name=Vincentius+Calvin&background=1f2937&color=fff" alt="Profile" class="w-8 h-8 rounded-full border-2 border-red-600">
                         <span class="ml-2 font-medium text-sm hidden sm:block">Vincentius Calvin</span>
                     </div>
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
+            <!-- Main Dashboard -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6 relative">
                 <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Data Latihan GOR Thalia</h2>
                 
-                <!-- Data Table -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                <!-- Tabel Data -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
                     <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <h3 class="text-lg font-semibold">Daftar Kehadiran Anggota</h3>
                         <button id="btn-rekap" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition shadow-sm">Rekap ke Sheets</button>
@@ -105,7 +108,6 @@
                                         <button class="text-blue-600 dark:text-blue-400 hover:underline text-sm">Edit</button>
                                     </td>
                                 </tr>
-                                <!-- Baris pemain lainnya akan di-render di sini -->
                             </tbody>
                         </table>
                     </div>
@@ -114,11 +116,11 @@
         </div>
     </div>
 
-    <!-- Logika UI & Interaksi -->
+    <!-- 3. SCRIPT LOGIKA -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             
-            // 1. Logika Global Loader (Ditambahkan pengecekan if loader exist)
+            // Logika Global Loader yang aman
             const loader = document.getElementById('global-loader');
             if (loader) {
                 setTimeout(() => {
@@ -127,7 +129,7 @@
                 }, 600);
             }
 
-            // 2. Sidebar Toggle (Mobile Responsive)
+            // Logika Sidebar Mobile
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebar-toggle');
             
@@ -136,7 +138,7 @@
                     sidebar.classList.toggle('-translate-x-full');
                 });
 
-                // Tutup sidebar otomatis saat klik area luar pada layar mobile
+                // Tutup otomatis saat klik luar di mobile
                 document.addEventListener('click', (e) => {
                     if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
                         sidebar.classList.add('-translate-x-full');
@@ -144,7 +146,7 @@
                 });
             }
 
-            // 3. Toggle Dark Mode Dinamis
+            // Logika Dark Mode
             const themeToggleBtn = document.getElementById('theme-toggle');
             const html = document.documentElement;
             const themeIcon = document.getElementById('theme-icon');
@@ -152,15 +154,12 @@
             if (themeToggleBtn && themeIcon) {
                 const updateIcon = (isDark) => {
                     if (isDark) {
-                        // Ikon Matahari (Light Mode Trigger)
                         themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
                     } else {
-                        // Ikon Bulan (Dark Mode Trigger)
                         themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
                     }
                 };
 
-                // Inisialisasi ikon saat pertama kali dimuat
                 updateIcon(html.classList.contains('dark'));
 
                 themeToggleBtn.addEventListener('click', () => {
