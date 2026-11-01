@@ -1,4 +1,29 @@
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 transition-colors duration-300 font-sans">
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Manajemen - Fourteen Badminton Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        red: { 600: '#dc2626', 700: '#b91c1c' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Animasi Loader */
+        .loader { border-top-color: #dc2626; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300 font-sans">
 
     <!-- 1. LOADER WAJIB DI SINI: Tepat setelah <body> dibuka -->
     <div id="global-loader" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; display: flex; align-items: center; justify-content: center;" class="bg-white dark:bg-gray-900 transition-opacity duration-300">
@@ -7,11 +32,143 @@
 
     <!-- 2. KONTEN WEB LAINNYA DI BAWAH LOADER -->
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <aside id="sidebar"> ... </aside>
         
-        <!-- Main Content & Header -->
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-white dark:bg-gray-800 shadow-md transform -translate-x-full md:translate-x-0 transition-transform duration-300 fixed md:static h-full z-40">
+            <div class="flex items-center justify-center h-20 border-b border-gray-200 dark:border-gray-700">
+                <img src="https://ui-avatars.com/api/?name=Fourteen+BC&background=dc2626&color=fff&rounded=true" alt="Logo FBC" class="w-10 h-10 mr-3">
+                <h1 class="text-xl font-bold text-red-600 dark:text-red-500">Fourteen BC</h1>
+            </div>
+            <nav class="p-4 space-y-2">
+                <a href="#" class="flex items-center p-3 text-white bg-red-600 rounded-lg hover:bg-red-700 transition">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Dashboard
+                </a>
+                <a href="#" class="flex items-center p-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    Absensi Latihan
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <header> ... </header>
+            <!-- Topbar -->
+            <header class="h-20 bg-white dark:bg-gray-800 shadow-sm flex items-center justify-between px-6 z-30 relative">
+                <button id="sidebar-toggle" class="md:hidden text-gray-600 dark:text-gray-300 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                
+                <div class="flex items-center space-x-4 ml-auto">
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition focus:outline-none">
+                        <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <div class="flex items-center">
+                        <img src="https://ui-avatars.com/api/?name=Vincentius+Calvin&background=1f2937&color=fff" alt="Profile" class="w-8 h-8 rounded-full">
+                        <span class="ml-2 font-medium text-sm hidden sm:block">Vincentius Calvin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6 relative">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Data Latihan GOR Thalia</h2>
+                
+                <!-- Data Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold">Daftar Kehadiran Anggota</h3>
+                        <button id="btn-rekap" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition shadow-sm">Rekap ke Sheets</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full whitespace-nowrap">
+                            <thead class="bg-gray-50 dark:bg-gray-700 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-3">Nama Pemain</th>
+                                    <th class="px-6 py-3">Kelas</th>
+                                    <th class="px-6 py-3">Status</th>
+                                    <th class="px-6 py-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition">
+                                    <td class="px-6 py-4 flex items-center">
+                                        <div class="h-8 w-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold mr-3">VC</div>
+                                        <span class="font-medium">Vincentius Calvin Ananda</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">XI-7</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Hadir</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <button class="text-blue-600 dark:text-blue-400 hover:underline text-sm">Edit</button>
+                                    </td>
+                                </tr>
+                                <!-- Baris pemain lainnya akan di-render di sini -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
+
+    <!-- Logika UI & Interaksi -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // 1. Logika Global Loader (Ditambahkan pengecekan if loader exist)
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 300);
+                }, 600);
+            }
+
+            // 2. Sidebar Toggle (Mobile Responsive)
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('-translate-x-full');
+                });
+
+                // Tutup sidebar otomatis saat klik area luar pada layar mobile
+                document.addEventListener('click', (e) => {
+                    if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            }
+
+            // 3. Toggle Dark Mode Dinamis
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+
+            if (themeToggleBtn && themeIcon) {
+                const updateIcon = (isDark) => {
+                    if (isDark) {
+                        // Ikon Matahari (Light Mode Trigger)
+                        themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+                    } else {
+                        // Ikon Bulan (Dark Mode Trigger)
+                        themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+                    }
+                };
+
+                // Inisialisasi ikon saat pertama kali dimuat
+                updateIcon(html.classList.contains('dark'));
+
+                themeToggleBtn.addEventListener('click', () => {
+                    html.classList.toggle('dark');
+                    updateIcon(html.classList.contains('dark'));
+                });
+            }
+        });
+    </script>
+</body>
+</html>
