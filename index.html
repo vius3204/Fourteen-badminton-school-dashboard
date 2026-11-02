@@ -55,11 +55,17 @@
       background: #0b0f19 !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
       color: #f8fafc !important;
+      position: relative;
+      z-index: 60;
+      pointer-events: auto !important;
     }
     body.theme-light .input-theme {
       background: #ffffff !important;
       border: 1px solid rgba(0, 0, 0, 0.15) !important;
       color: #0f172a !important;
+      position: relative;
+      z-index: 60;
+      pointer-events: auto !important;
     }
     .input-theme:focus {
       border-color: #3b82f6 !important;
@@ -696,7 +702,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold opacity-80 mb-1.5">Tanggal</label>
-            <input type="date" id="preTanggal" required class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none">
+            <input type="date" id="preTanggal" required class="w-full px-4 py-3 input-theme rounded-xl text-sm font-medium outline-none cursor-pointer">
           </div>
           <div>
             <label class="block text-xs font-bold opacity-80 mb-1.5">Materi Latihan</label>
